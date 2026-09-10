@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Suman Jewellers - Enterprise Operations Portal</title>
+    <title>Suman Jewellers - GRAS 12+1 Operations Portal</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         .hidden-view { display: none !important; }
@@ -91,7 +91,7 @@
                         <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-500 flex items-center justify-center font-black text-slate-950 text-xs">SJ</div>
                         <div>
                             <h1 class="text-xs font-bold tracking-tight uppercase">Suman Jewellers</h1>
-                            <p class="text-[9px] sm:text-[10px] text-slate-400">Operations Console</p>
+                            <p class="text-[9px] sm:text-[10px] text-slate-400">GRAS Operations Console</p>
                         </div>
                     </div>
 
@@ -117,7 +117,6 @@
                 <div id="headerNavBar" class="hidden-view flex items-center gap-1 sm:gap-1.5 flex-wrap w-full lg:w-auto justify-start sm:justify-end">
                     <button onclick="switchKmpTab('members')" id="tabBtnMembers" class="bg-slate-800 text-white text-[11px] sm:text-xs font-semibold px-2.5 py-1.5 rounded-lg cursor-pointer transition-all">Directory</button>
                     <button onclick="switchKmpTab('approvals')" id="tabBtnApprovals" class="bg-slate-800 text-slate-400 text-[11px] sm:text-xs font-semibold px-2.5 py-1.5 rounded-lg cursor-pointer transition-all">Queue</button>
-                    <button onclick="switchKmpTab('defaulters')" id="tabBtnDefaulters" class="bg-slate-800 text-slate-400 text-[11px] sm:text-xs font-semibold px-2.5 py-1.5 rounded-lg cursor-pointer transition-all">Overdue</button>
                     <button onclick="switchKmpTab('users')" id="tabBtnUsers" class="hidden-view bg-slate-800 text-slate-400 text-[11px] sm:text-xs font-semibold px-2.5 py-1.5 rounded-lg cursor-pointer transition-all">Permissions</button>
                     <button onclick="openAddMemberModal()" id="btnTopAddMember" class="bg-amber-700 hover:bg-amber-800 text-white font-semibold px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs uppercase tracking-wider transition-all cursor-pointer">
                         + Enroll
@@ -150,7 +149,7 @@
                         </button>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-2">
-                        <input type="text" id="searchInput" placeholder="Search by Mobile, Token Identifier, Name, or Account Code..." class="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium focus:outline-none focus:ring-1 focus:ring-slate-900 focus:bg-white transition-all">
+                        <input type="text" id="searchInput" placeholder="Search by Mobile, Token No, Name, or Account Code..." class="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium focus:outline-none focus:ring-1 focus:ring-slate-900 focus:bg-white transition-all">
                         <button onclick="searchMemberRecords()" id="btnSearch" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-lg text-xs font-semibold transition-all cursor-pointer">
                             Search Records
                         </button>
@@ -168,24 +167,13 @@
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 border-b border-slate-800 pb-4 mb-4">
                             <div>
                                 <div class="flex items-center gap-2">
-                                    <span class="text-[10px] bg-slate-800 text-slate-300 font-bold px-2 py-0.5 rounded uppercase tracking-wider">Account Active</span>
-                                    <span id="viewWinBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300">Regular Plan</span>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-900/40 text-amber-300 border border-amber-800/50">12+1 Assured Scheme</span>
+                                    <span id="viewDueRuleBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300">Due: 10th</span>
                                 </div>
                                 <h2 id="viewCustName" class="text-lg sm:text-xl font-bold mt-1 text-white uppercase tracking-tight">-</h2>
                                 <p id="viewCustPhone" class="text-xs font-mono text-slate-400 mt-0.5">-</p>
                             </div>
                             <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto">
-                                <div class="flex items-center bg-slate-800 border border-slate-700 rounded-lg p-1 text-xs">
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase px-1.5 sm:px-2">Wins:</span>
-                                    <select id="selWinCount" class="bg-slate-900 text-white border border-slate-700 rounded text-xs font-bold px-1.5 py-1 focus:outline-none">
-                                        <option value="0">0</option>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                    </select>
-                                    <button onclick="saveWinnerCount()" class="ml-1 bg-amber-700 hover:bg-amber-600 text-white font-bold px-2 py-1 rounded text-xs cursor-pointer">Commit</button>
-                                </div>
-
                                 <button onclick="openManualDepositModal()" id="btnActionDeposit" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition-all cursor-pointer border border-slate-700">
                                     Counter Deposit
                                 </button>
@@ -201,7 +189,7 @@
                                 <span id="viewKittyNo" class="font-mono font-bold text-xs sm:text-sm text-amber-400">-</span>
                             </div>
                             <div class="bg-slate-800/60 p-2.5 sm:p-3 rounded-lg border border-slate-700/50">
-                                <span class="text-slate-400 uppercase text-[9px] block font-bold">Token Identifier</span>
+                                <span class="text-slate-400 uppercase text-[9px] block font-bold">Token Number</span>
                                 <span id="viewCustId" class="font-mono font-bold text-xs sm:text-sm text-slate-200">-</span>
                             </div>
                             <div class="bg-slate-800/60 p-2.5 sm:p-3 rounded-lg border border-slate-700/50">
@@ -209,7 +197,7 @@
                                 <span id="viewOtherDetails" class="font-mono font-bold text-xs sm:text-sm text-slate-200">-</span>
                             </div>
                             <div class="bg-slate-800/60 p-2.5 sm:p-3 rounded-lg border border-slate-700/50">
-                                <span class="text-slate-400 uppercase text-[9px] block font-bold">Installment</span>
+                                <span class="text-slate-400 uppercase text-[9px] block font-bold">Monthly Installment</span>
                                 <span id="viewMonthlyAmount" class="font-bold text-xs sm:text-sm text-slate-200">INR 0</span>
                             </div>
                         </div>
@@ -219,12 +207,12 @@
                                 <span class="text-slate-400 uppercase text-[9px] block font-bold">Total Deposited Principal</span>
                                 <span id="viewTotalBalance" class="font-bold text-xs sm:text-sm text-white font-mono">INR 0</span>
                             </div>
-                            <div class="bg-amber-900/30 p-2.5 sm:p-3 rounded-lg border border-amber-800/40">
-                                <span class="text-[9px] uppercase tracking-wider text-amber-300 block font-bold">Total Booked Gold (22K)</span>
-                                <span id="viewTotalGoldGrams" class="font-mono text-xs sm:text-sm font-bold text-amber-200">0.000 g</span>
+                            <div class="bg-emerald-950/40 p-2.5 sm:p-3 rounded-lg border border-emerald-800/40">
+                                <span class="text-[9px] uppercase tracking-wider text-emerald-300 block font-bold">13th Month Jeweller Bonus</span>
+                                <span id="viewJewellerBonus" class="font-mono text-xs sm:text-sm font-bold text-emerald-300">+INR 0</span>
                             </div>
                             <div class="bg-slate-800/40 p-2.5 sm:p-3 rounded-lg border border-slate-700/40">
-                                <span class="text-slate-400 uppercase text-[9px] block font-bold">Projected Maturity</span>
+                                <span class="text-slate-400 uppercase text-[9px] block font-bold">Maturity Jewellery Worth (12+1)</span>
                                 <span id="viewMaturityTotal" class="font-bold text-xs sm:text-sm text-white font-mono">INR 0</span>
                             </div>
                         </div>
@@ -233,8 +221,8 @@
                     <!-- LEDGER TABLE -->
                     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                         <div class="p-3.5 sm:p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Scheme Ledger Statement</h3>
-                            <span id="viewPaidRatio" class="text-xs font-semibold text-slate-500">0 Completed</span>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Scheme Ledger Statement (12 Months)</h3>
+                            <span id="viewPaidRatio" class="text-xs font-semibold text-slate-500">0 / 12 Completed</span>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse text-xs">
@@ -289,50 +277,12 @@
                 </div>
             </div>
 
-            <!-- TAB 3: OVERDUE DEFAULTERS -->
-            <div id="tabContentDefaulters" class="space-view space-y-3.5 sm:space-y-4 hidden-view">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-sm gap-2.5 sm:gap-3">
-                    <div>
-                        <h2 class="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-tight">Overdue Account Tracker</h2>
-                        <p class="text-[11px] text-slate-500">Accounts past the standard calendar cutoff</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="sendBulkEmailReminders()" id="btnBulkEmail" class="bg-amber-800 hover:bg-amber-700 text-white text-xs font-semibold px-3 py-1.5 sm:py-2 rounded-lg transition-all cursor-pointer">
-                            Dispatch Email Notifications
-                        </button>
-                        <button onclick="loadOverdueDefaulters()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3 py-1.5 sm:py-2 rounded-lg transition-all cursor-pointer">
-                            Refresh
-                        </button>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead>
-                                <tr class="text-slate-500 bg-slate-50 border-b border-slate-200">
-                                    <th class="p-3 uppercase">Member Details</th>
-                                    <th class="p-3 uppercase">Account</th>
-                                    <th class="p-3 uppercase">Effective Date</th>
-                                    <th class="p-3 uppercase">Unpaid Schedules</th>
-                                    <th class="p-3 uppercase">Total Overdue</th>
-                                    <th class="p-3 uppercase text-center">Communication</th>
-                                </tr>
-                            </thead>
-                            <tbody id="defaulterTableBody" class="divide-y divide-slate-100">
-                                <tr><td colspan="6" class="p-6 text-center text-slate-400">Loading overdue account register...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 4: ACCESS CONTROL (ADMINISTRATOR ONLY) -->
+            <!-- TAB 3: ACCESS CONTROL (ADMINISTRATOR ONLY) -->
             <div id="tabContentUsers" class="space-view space-y-3.5 sm:space-y-4 hidden-view">
                 <div class="flex justify-between items-center bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-sm">
                     <div>
                         <h2 class="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-tight">Access Control &amp; Roles</h2>
-                        <p class="text-[11px] text-slate-500">Manage privileges, approval powers, and 2SV</p>
+                        <p class="text-[11px] text-slate-500">Manage operator permissions, validation authority, and 2SV</p>
                     </div>
                     <button onclick="openUserEditModal()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg cursor-pointer">
                         Add Operator
@@ -408,7 +358,7 @@
     <div id="addMemberModal" class="hidden-view fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-start justify-center p-3 pt-4 sm:pt-8 z-50 overflow-y-auto">
         <div class="bg-white rounded-xl p-4 sm:p-6 w-full max-w-md shadow-2xl border border-slate-200 max-h-[85vh] overflow-y-auto animate-popup">
             <div class="border-b border-slate-200 pb-2.5 mb-3 flex justify-between items-center">
-                <h3 class="text-xs sm:text-sm font-bold text-slate-900 uppercase">Enroll Scheme Participant</h3>
+                <h3 class="text-xs sm:text-sm font-bold text-slate-900 uppercase">Enroll GRAS Participant</h3>
                 <button onclick="closeAddMemberModal()" class="text-slate-400 hover:text-slate-700 font-bold text-base cursor-pointer p-1">&times;</button>
             </div>
             
@@ -427,7 +377,7 @@
                         <input type="number" id="newAmount" required min="2000" step="1000" value="5000" class="w-full px-3 py-2 border border-slate-200 rounded-lg font-bold">
                     </div>
                     <div>
-                        <label class="font-semibold text-slate-700 block mb-1">Token Reference</label>
+                        <label class="font-semibold text-slate-700 block mb-1">Token Number</label>
                         <input type="text" id="newCustId" class="w-full px-3 py-2 border border-slate-200 rounded-lg font-mono">
                     </div>
                 </div>
@@ -512,7 +462,6 @@
         let sessionUser = null;
         let activeSearchResults = [];
         let selectedMemberData = null;
-        let activeDefaultersList = [];
 
         let activeConfirmResolver = null;
         let activePromptResolver = null;
@@ -601,7 +550,7 @@
 
         // --- LIFECYCLE & HEADER-MOUNTED AUTHENTICATION ---
         window.addEventListener('DOMContentLoaded', () => {
-            const stored = sessionStorage.getItem('kmpUserSession');
+            const stored = sessionStorage.getItem('kmpUserSession_GRAS');
             if (stored) {
                 sessionUser = JSON.parse(stored);
                 renderUserUI();
@@ -625,7 +574,7 @@
                 if (res.success && res.user) {
                     sessionUser = res.user;
                     sessionUser.pin = pin;
-                    sessionStorage.setItem('kmpUserSession', JSON.stringify(sessionUser));
+                    sessionStorage.setItem('kmpUserSession_GRAS', JSON.stringify(sessionUser));
                     renderUserUI();
                 } else {
                     uiAlert("Authentication Failed", res.error || "Invalid operator credentials.");
@@ -638,7 +587,7 @@
         }
 
         function logoutKmp() {
-            sessionStorage.removeItem('kmpUserSession');
+            sessionStorage.removeItem('kmpUserSession_GRAS');
             window.location.reload();
         }
 
@@ -664,7 +613,7 @@
         }
 
         function switchKmpTab(tab) {
-            ['Members', 'Approvals', 'Defaulters', 'Users'].forEach(t => {
+            ['Members', 'Approvals', 'Users'].forEach(t => {
                 const el = document.getElementById('tabContent' + t);
                 const btn = document.getElementById('tabBtn' + t);
                 if (el) el.classList.add('hidden-view');
@@ -677,7 +626,6 @@
             if (activeBtn) activeBtn.className = "bg-slate-800 text-white text-[11px] sm:text-xs font-semibold px-2.5 py-1.5 rounded-lg cursor-pointer transition-all";
 
             if (tab === 'approvals') loadKmpPendingApprovals();
-            if (tab === 'defaulters') loadOverdueDefaulters();
             if (tab === 'users') loadStaffUsersList();
         }
 
@@ -747,15 +695,11 @@
 
             document.getElementById('viewCustName').innerText = member.name;
             document.getElementById('viewCustPhone').innerText = "+91 " + member.phone;
-            document.getElementById('viewCustId').innerText = member.customerId || member.tokenNo || "-";
+            document.getElementById('viewCustId').innerText = member.tokenNo || member.customerId || "-";
             document.getElementById('viewKittyNo').innerText = member.acCode || member.kittyNumber;
             document.getElementById('viewMonthlyAmount').innerText = "INR " + Number(member.monthlyAmount).toLocaleString('en-IN');
             document.getElementById('viewOtherDetails').innerText = member.doj || member.otherDetails || "-";
-
-            const winCount = Number(member.winCount) || 0;
-            document.getElementById('selWinCount').value = winCount;
-            const winBadge = document.getElementById('viewWinBadge');
-            winBadge.innerText = winCount > 0 ? `${winCount} Event Winner` : `Standard Member`;
+            document.getElementById('viewDueRuleBadge').innerText = "Due: " + (member.dueDateRule || "10th");
 
             fetch(`${config.scriptUrl}?action=getData&phone=${encodeURIComponent(member.phone)}&kittyNumber=${encodeURIComponent(member.acCode || member.kittyNumber)}&_ts=${Date.now()}`, {
                 method: "GET",
@@ -767,33 +711,24 @@
                 if (!res || !res.profile) return uiAlert("Query Error", "Unable to load member statement details.");
 
                 const userTxs = res.transactions || [];
-                let paidMonths = 0, totalDeposited = 0, totalGoldWeight = 0;
+                let paidMonths = 0, totalDeposited = 0;
 
                 userTxs.forEach(t => {
                     if (t.status && t.status.toLowerCase() === "paid") {
                         paidMonths++;
                         totalDeposited += parseFloat(t.amount) || 0;
-                        totalGoldWeight += parseFloat(t.bookedGrams) || 0;
                     }
                 });
 
                 document.getElementById('viewTotalBalance').innerText = "INR " + totalDeposited.toLocaleString('en-IN');
-                document.getElementById('viewTotalGoldGrams').innerText = `${totalGoldWeight.toFixed(3)} g`;
                 document.getElementById('viewPaidRatio').innerText = `${paidMonths} / ${config.schemeMonths} Completed`;
 
                 const mAmount = Number(member.monthlyAmount) || 0;
-                let fullPrincipal = 11 * mAmount;
-                let maturityVal = 0;
-                if (winCount > 0) {
-                    let prizePerWin = 0;
-                    if (winCount === 1) prizePerWin = 15000;
-                    else if (winCount === 2) prizePerWin = 30000;
-                    else prizePerWin = 45000;
-                    maturityVal = fullPrincipal + prizePerWin;
-                } else {
-                    let interest = (mAmount === 8000) ? 3000 : 2000;
-                    maturityVal = fullPrincipal + interest;
-                }
+                let twelveMonthsPrincipal = 12 * mAmount;
+                let assuredBonus = mAmount;
+                let maturityVal = twelveMonthsPrincipal + assuredBonus;
+
+                document.getElementById('viewJewellerBonus').innerText = "+INR " + assuredBonus.toLocaleString('en-IN');
                 document.getElementById('viewMaturityTotal').innerText = "INR " + maturityVal.toLocaleString('en-IN');
 
                 const tbody = document.getElementById('memberTxTableBody');
@@ -838,48 +773,7 @@
             .catch(() => hideLoader());
         }
 
-        // --- DRAW ALLOCATIONS COMMIT ---
-        function saveWinnerCount() {
-            if (!selectedMemberData) return uiAlert("Selection Required", "No active member record selected.");
-
-            const sel = document.getElementById('selWinCount');
-            const newCount = parseInt(sel.value, 10) || 0;
-            const phone = (selectedMemberData.phone || "").toString().replace(/\D/g, "").trim();
-            const acCode = (selectedMemberData.acCode || selectedMemberData.kittyNumber || "").toString().replace(/^['"]|['"]$/g, "").trim();
-
-            showLoader("Updating Draw Winner Records in Database...");
-
-            const targetUrl = `${config.scriptUrl}?action=updateWinCount`
-                + `&phone=${encodeURIComponent(phone)}`
-                + `&acCode=${encodeURIComponent(acCode)}`
-                + `&winCount=${encodeURIComponent(newCount)}`
-                + `&_ts=${Date.now()}`;
-
-            fetch(targetUrl, { method: "GET", mode: "cors" })
-            .then(r => r.json())
-            .then(res => {
-                hideLoader();
-                if (res && res.success) {
-                    uiAlert("Database Updated", `Participant draw wins successfully recorded as ${newCount}.`);
-                    selectedMemberData.winCount = newCount;
-
-                    const winBadge = document.getElementById('viewWinBadge');
-                    if (winBadge) {
-                        winBadge.innerText = newCount > 0 ? `${newCount} Event Winner` : `Standard Member`;
-                    }
-
-                    loadMemberLedger(selectedMemberData);
-                } else {
-                    uiAlert("Update Failed", res.error || "Unable to write allocation record to database.");
-                }
-            })
-            .catch(() => {
-                hideLoader();
-                uiAlert("Network Error", "Database connection timeout during update.");
-            });
-        }
-
-        // --- VERIFICATION QUEUE & TWO-TIER SYSTEM ---
+        // --- VERIFICATION QUEUE & APPROVAL SYSTEM ---
         function loadKmpPendingApprovals() {
             const tableBody = document.getElementById('kmpApprovalTableBody');
             showLoader("Accessing Verification Queue...");
@@ -908,7 +802,7 @@
 
                     if (!isReviewed) {
                         actionHtml += `
-                            <button onclick="executeRateReview('${item.row}', ${item.amount}, ${item.month}, ${item.bonusCash || 0})" class="bg-amber-800 hover:bg-amber-700 text-white text-[11px] sm:text-xs px-2.5 py-1 rounded font-semibold cursor-pointer">
+                            <button onclick="executeRateReview('${item.row}', ${item.amount})" class="bg-amber-800 hover:bg-amber-700 text-white text-[11px] sm:text-xs px-2.5 py-1 rounded font-semibold cursor-pointer">
                                 Set 22K Rate &amp; Review
                             </button>
                         `;
@@ -916,7 +810,7 @@
 
                     if (sessionUser.role === "Admin" || sessionUser.canFinalApprove) {
                         actionHtml += `
-                            <button onclick="executeFinalApproval('${item.row}', ${item.amount}, ${isReviewed}, ${item.month}, ${item.bonusCash || 0})" class="ml-1 bg-slate-900 hover:bg-slate-800 text-white text-[11px] sm:text-xs px-2.5 py-1 rounded font-semibold cursor-pointer">
+                            <button onclick="executeFinalApproval('${item.row}', ${item.amount}, ${isReviewed})" class="ml-1 bg-slate-900 hover:bg-slate-800 text-white text-[11px] sm:text-xs px-2.5 py-1 rounded font-semibold cursor-pointer">
                                 ${isReviewed ? 'Commit to Ledger' : 'Authorize &amp; Post'}
                             </button>
                         `;
@@ -950,10 +844,7 @@
             .catch(() => hideLoader());
         }
 
-        async function executeRateReview(rowId, amount, monthNum, bonusCash) {
-            monthNum = parseInt(monthNum, 10) || 1;
-            bonusCash = Number(bonusCash) || 0;
-
+        async function executeRateReview(rowId, amount) {
             const promptFields = [
                 { id: 'rateVal', label: 'Today’s 22K Gold Rate for 10 Grams (INR) *', type: 'number', required: true, placeholder: 'e.g. 68500', mono: true }
             ];
@@ -962,12 +853,7 @@
                 promptFields.push({ id: 'secondPin', label: 'Secondary Operator PIN (2-Step Verification) *', type: 'password', required: true, placeholder: 'Enter PIN', mono: true });
             }
 
-            let subtitle = `Installment: INR ${Number(amount).toLocaleString('en-IN')}`;
-            if (monthNum === 11) {
-                subtitle += ` (Month 11 Final Settlement: Includes INR ${bonusCash.toLocaleString('en-IN')} Gift/Winner Bonus Gold)`;
-            }
-
-            const inputData = await uiPrompt("Tier-1 Rate Review", subtitle, promptFields);
+            const inputData = await uiPrompt("Tier-1 Rate Review", `Remittance: INR ${Number(amount).toLocaleString('en-IN')}`, promptFields);
             if (!inputData) return;
 
             const rate10g = parseFloat(inputData.rateVal);
@@ -992,11 +878,7 @@
             .then(res => {
                 hideLoader();
                 if (res.success) {
-                    let msg = `Valuation posted to database. Total allocated weight: ${res.gramsBooked} grams.`;
-                    if (res.bonusCash > 0) {
-                        msg += ` (Includes Month 11 Gold Gift of INR ${res.bonusCash.toLocaleString('en-IN')}).`;
-                    }
-                    uiAlert("Verification Logged", msg + " Awaiting final ledger sign-off.");
+                    uiAlert("Verification Logged", `Valuation posted to database. Allocated weight: ${res.gramsBooked} grams. Awaiting final ledger sign-off.`);
                     loadKmpPendingApprovals();
                 } else {
                     uiAlert("Authorization Error", res.error || "Review rejected by server.");
@@ -1008,18 +890,11 @@
             });
         }
 
-        async function executeFinalApproval(rowId, amount, isReviewed, monthNum, bonusCash) {
-            monthNum = parseInt(monthNum, 10) || 1;
-            bonusCash = Number(bonusCash) || 0;
+        async function executeFinalApproval(rowId, amount, isReviewed) {
             let rate10g = 0;
 
             if (!isReviewed) {
-                let subtitle = `Installment: INR ${Number(amount).toLocaleString('en-IN')}`;
-                if (monthNum === 11) {
-                    subtitle += ` (Month 11 Final Settlement: Includes INR ${bonusCash.toLocaleString('en-IN')} Gift/Winner Bonus Gold)`;
-                }
-
-                const inputData = await uiPrompt("Direct Ledger Authorization", subtitle, [
+                const inputData = await uiPrompt("Direct Ledger Authorization", `Remittance: INR ${Number(amount).toLocaleString('en-IN')}`, [
                     { id: 'rateVal', label: 'Today’s 22K Gold Rate for 10 Grams (INR) *', type: 'number', required: true, placeholder: 'e.g. 68500', mono: true }
                 ]);
                 if (!inputData) return;
@@ -1027,12 +902,7 @@
                 if (isNaN(rate10g) || rate10g <= 0) return uiAlert("Validation Failure", "A valid 22K gold rate input is strictly mandatory.");
             }
 
-            let confirmMsg = "Proceed with permanent ledger booking and customer passbook credit?";
-            if (monthNum === 11) {
-                confirmMsg = `Proceed with final Month 11 settlement? This automatically credits the installment plus INR ${bonusCash.toLocaleString('en-IN')} Gold Gift directly into customer passbook.`;
-            }
-
-            const confirmed = await uiConfirm("Confirm Transaction Authorization", confirmMsg);
+            const confirmed = await uiConfirm("Confirm Transaction Authorization", "Proceed with permanent ledger booking and customer passbook credit?");
             if (!confirmed) return;
 
             showLoader("Posting Authorization to Database...");
@@ -1053,11 +923,7 @@
             .then(res => {
                 hideLoader();
                 if (res.success) {
-                    let msg = isReviewed ? "Transaction settled and posted to ledger." : `Transaction authorized. ${res.gramsBooked} grams credited to passbook.`;
-                    if (res.bonusCash > 0) {
-                        msg += ` (Included Month 11 Gift/Winner Gold: INR ${res.bonusCash.toLocaleString('en-IN')}).`;
-                    }
-                    uiAlert("Settlement Committed", msg);
+                    uiAlert("Settlement Committed", isReviewed ? "Transaction settled and posted to ledger." : `Transaction authorized. ${res.gramsBooked} grams credited to passbook.`);
                     loadKmpPendingApprovals();
                 } else {
                     uiAlert("Posting Error", res.error || "Server rejected ledger entry.");
@@ -1214,7 +1080,7 @@
                 phone: document.getElementById('newPhone').value.trim(),
                 name: document.getElementById('newName').value.trim(),
                 monthlyAmount: document.getElementById('newAmount').value,
-                customerId: document.getElementById('newCustId').value.trim() || "GRM-" + Math.floor(100 + Math.random() * 900),
+                customerId: document.getElementById('newCustId').value.trim() || "-",
                 kittyNumber: document.getElementById('newKittyNo').value.trim(),
                 otherDetails: document.getElementById('newRemarks').value,
                 email: document.getElementById('newEmail').value.trim()
@@ -1262,22 +1128,11 @@
         function calculateRealtimeGold() {
             const amount = parseFloat(document.getElementById('depositAmount').value) || 0;
             const rate10g = parseFloat(document.getElementById('depositRate').value) || 0;
-            const month = parseInt(document.getElementById('depositMonth').value, 10) || 1;
-
-            let bonusCash = 0;
-            if (month === 11 && selectedMemberData) {
-                const wins = parseInt(selectedMemberData.winCount, 10) || 0;
-                if (wins === 1) bonusCash = 15000;
-                else if (wins === 2) bonusCash = 30000;
-                else if (wins >= 3) bonusCash = 45000;
-                else bonusCash = (Number(selectedMemberData.monthlyAmount) === 8000) ? 3000 : 2000;
-            }
 
             if (amount > 0 && rate10g > 0) {
                 const perGram = rate10g / 10;
-                const totalCash = amount + bonusCash;
-                const grams = (totalCash / perGram).toFixed(3);
-                document.getElementById('lblLiveAllocatedWeight').innerText = `${grams} g` + (bonusCash > 0 ? ` (+₹${bonusCash} Gift)` : '');
+                const grams = (amount / perGram).toFixed(3);
+                document.getElementById('lblLiveAllocatedWeight').innerText = `${grams} g`;
             } else {
                 document.getElementById('lblLiveAllocatedWeight').innerText = "0.000 g";
             }
@@ -1352,76 +1207,6 @@
             .catch(() => {
                 hideLoader();
                 uiAlert("Network Error", "Communication timeout during deletion.");
-            });
-        }
-
-        // --- OVERDUE TRACKER & DISPATCH ---
-        function loadOverdueDefaulters() {
-            const tbody = document.getElementById('defaulterTableBody');
-            showLoader("Auditing Overdue Schedules in Database...");
-
-            fetch(`${config.scriptUrl}?action=getOverdueDefaulters&_ts=${Date.now()}`, {
-                method: "GET",
-                mode: "cors"
-            })
-            .then(r => r.json())
-            .then(res => {
-                hideLoader();
-                if (!res || !res.success || !res.defaulters || res.defaulters.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500 font-semibold">Audit Complete: Zero overdue installments located.</td></tr>`;
-                    activeDefaultersList = [];
-                    return;
-                }
-
-                activeDefaultersList = res.defaulters;
-                tbody.innerHTML = "";
-                res.defaulters.forEach(item => {
-                    const monthsLabel = item.overdueMonths.map(m => `Month ${m}`).join(', ');
-                    const waText = encodeURIComponent(`Official Statement from ${config.brandName}\nAccount: ${item.acCode}\n\nNotice: Installment for ${monthsLabel} (INR ${item.totalDue.toLocaleString('en-IN')}) is currently outstanding.\n\nPlease remit online via UPI to ${config.upiVpa} or via counter to maintain policy eligibility.`);
-                    tbody.innerHTML += `
-                        <tr>
-                            <td class="p-3 font-semibold text-slate-900">
-                                <div>${item.name}</div>
-                                <div class="text-[11px] text-slate-500 font-mono">+91 ${item.phone}</div>
-                            </td>
-                            <td class="p-3 font-mono font-bold">${item.acCode}</td>
-                            <td class="p-3 font-mono text-slate-600">${item.doj}</td>
-                            <td class="p-3"><span class="bg-slate-200 text-slate-800 px-2 py-0.5 rounded font-bold">${monthsLabel}</span></td>
-                            <td class="p-3 font-mono font-bold text-slate-900">INR ${item.totalDue.toLocaleString('en-IN')}</td>
-                            <td class="p-3 text-center">
-                                <a href="https://wa.me/91${item.phone}?text=${waText}" target="_blank" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-2.5 py-1 rounded">
-                                    Issue Dispatch
-                                </a>
-                            </td>
-                        </tr>
-                    `;
-                });
-            })
-            .catch(() => hideLoader());
-        }
-
-        async function sendBulkEmailReminders() {
-            if (!activeDefaultersList || activeDefaultersList.length === 0) return uiAlert("Audit Result", "Zero overdue accounts identified.");
-            const confirmed = await uiConfirm("Confirm Automated Dispatch", `Dispatch electronic notices to all ${activeDefaultersList.length} accounts via server mail gateway?`);
-            if (!confirmed) return;
-
-            showLoader("Dispatching Email Notifications...");
-            fetch(`${config.scriptUrl}?action=sendBulkOverdueEmails&_ts=${Date.now()}`, {
-                method: "GET",
-                mode: "cors"
-            })
-            .then(r => r.json())
-            .then(res => {
-                hideLoader();
-                if (res && res.success) {
-                    uiAlert("Dispatch Summary", `Notices Dispatched: ${res.sentCount}\nSkipped (No Email Address): ${res.skippedNoEmail}`);
-                } else {
-                    uiAlert("Dispatch Failure", res.error || "Unable to send notices.");
-                }
-            })
-            .catch(() => {
-                hideLoader();
-                uiAlert("Network Error", "Timeout during bulk dispatch.");
             });
         }
     </script>
