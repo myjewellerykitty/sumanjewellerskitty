@@ -13,7 +13,7 @@
             to { transform: rotate(360deg); }
         }
         .animate-spin-slow {
-            animation: spinSlow 1s linear infinite;
+            animation: spinSlow 0.9s linear infinite;
         }
         @keyframes bounceShort {
             0%, 100% { transform: translateY(0); }
@@ -236,7 +236,7 @@
                 </div>
                 <div class="overflow-y-auto max-h-[55vh] pr-1.5">
                     <ol class="text-[10px] sm:text-[11px] text-slate-600 space-y-2 list-decimal pl-4 leading-relaxed text-justify">
-                        <li><strong>Enrollment:</strong> You must duly fill in &amp; sign the application form and deposit it at the Showroom with two photographs and a copy of any one identity card document[cite: 1]. Collect the Passbook and keep it in safe custody[cite: 1].</li>
+                        <li><strong>Enrollment:</strong> You must duly fill in &amp; sign the application form and deposit it at the Showroom with two photographs and a copy of any one identity card document (Voter ID / PAN / Driving License / Passport / Credit card with photo ID / other government approved ID)[cite: 1]. Collect the Passbook and keep it in safe custody[cite: 1].</li>
                         <li><strong>Installment Amount:</strong> Monthly installment is in multiples of Rs. 1,000/- (Minimum Rs. 2,000/-)[cite: 1]. You can pay installment amounts in multiples of the scheme opted for Golden Rose Assured Scheme[cite: 1].</li>
                         <li><strong>Payment Mode:</strong> The first installment must be paid by cash, card, or UPI at our Showroom[cite: 1]. Subsequent monthly installment payments can be made through Cash / Cheques / Post Dated Cheques (PDC) / Demand Draft / ECS / Online UPI[cite: 1]. Always verify the entry in your Passbook at the cash counter[cite: 1].</li>
                         <li><strong>Cheque Policy:</strong> Only one cheque per account per month will be accepted[cite: 1]. No outstation cheques accepted[cite: 1]. In case of cheque dishonor, Rs. 350/- penalty will be charged per transaction[cite: 1].</li>
@@ -558,7 +558,7 @@
                 if (!isSyncingActive) {
                     executePassbookRender(phone, acCode, true);
                 }
-            }, 15000);
+            }, 30000);
         }
 
         function executePassbookRender(phone, acCode, isSilentSync = false) {
@@ -591,7 +591,6 @@
                 document.getElementById('lblTokenNo').innerText = data.profile.tokenNo || "-";
                 document.getElementById('lblDoj').innerText = data.profile.doj || "-";
 
-                // Cutoff and Due Dates based on Join Date Rule
                 document.getElementById('lblDueCutoffBadge').innerText = "Due: " + data.profile.dueDayText;
                 document.getElementById('lblDueScheduleNotice').innerText = `Installment Due Date: ${data.profile.dueDayText}. Clear 12 months consecutively to receive 13th-month bonus worth ₹${globalMonthlyAmount.toLocaleString('en-IN')}.`;
 
@@ -610,7 +609,6 @@
                 let principalPaid = paidMonthsCount * globalMonthlyAmount;
                 document.getElementById('custLiveBalance').innerText = "₹" + principalPaid.toLocaleString('en-IN');
 
-                // 12 + 1 Assured Jewellery Valuation
                 let twelveMonthsPrincipal = 12 * globalMonthlyAmount;
                 let assuredBonus = globalMonthlyAmount;
                 let totalJewelleryWorth = twelveMonthsPrincipal + assuredBonus;
@@ -618,7 +616,6 @@
                 document.getElementById('lblJewellerBonus').innerText = "+₹" + assuredBonus.toLocaleString('en-IN');
                 document.getElementById('lblTotalJewelleryWorth').innerText = "₹" + totalJewelleryWorth.toLocaleString('en-IN');
 
-                // 12 Months Sequential Grid
                 const grid = document.getElementById('gridWrapper');
                 grid.innerHTML = "";
 
@@ -798,13 +795,13 @@
                     } else {
                         alert("Notice: " + (res.error || "Proof registered."));
                     }
-                    setTimeout(() => executePassbookRender(globalCustomerPhone, globalAcCode), 1200);
+                    setTimeout(() => executePassbookRender(globalCustomerPhone, globalAcCode), 800);
                 })
                 .catch(() => {
                     hideLoader();
                     closePaymentModal();
                     alert("Installment proof recorded! Refreshing passbook...");
-                    setTimeout(() => executePassbookRender(globalCustomerPhone, globalAcCode), 1500);
+                    setTimeout(() => executePassbookRender(globalCustomerPhone, globalAcCode), 1000);
                 });
             };
 
@@ -814,12 +811,12 @@
                     const img = new Image();
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 300;
+                        const MAX_WIDTH = 280;
                         let w = img.width, h = img.height;
                         if (w > MAX_WIDTH) { h = Math.round((h * MAX_WIDTH) / w); w = MAX_WIDTH; }
                         canvas.width = w; canvas.height = h;
                         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                        postProof(canvas.toDataURL('image/jpeg', 0.3));
+                        postProof(canvas.toDataURL('image/jpeg', 0.25));
                     };
                     img.src = reader.result;
                 };
