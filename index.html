@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Golden Rose Magic - Suman Jewellers</title>
+    <title>Golden Rose Assured Scheme (GRAS 12+1) — Suman Jewellers</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         .hidden-view { display: none !important; }
@@ -25,7 +25,7 @@
             animation: bounceShort 0.35s ease-out;
         }
 
-        /* Custom Interactive Cursor */
+        /* Interactive Desktop Cursor */
         @media (hover: hover) and (pointer: fine) {
             * { cursor: none !important; }
             .cursor-dot {
@@ -80,7 +80,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col justify-between">
 
-    <!-- Interactive Desktop Cursor -->
+    <!-- Interactive Desktop Cursor Elements -->
     <div id="cursorDot" class="cursor-dot"></div>
     <div id="cursorRing" class="cursor-ring"></div>
 
@@ -89,13 +89,13 @@
         <div class="bg-white rounded-2xl py-3 px-5 shadow-2xl border border-amber-300 flex items-center gap-3.5 max-w-sm w-full animate-bounce-short">
             <div class="w-7 h-7 border-3 border-amber-200 border-t-amber-800 rounded-full animate-spin-slow shrink-0"></div>
             <div>
-                <p id="loadingMessage" class="text-xs font-bold text-slate-900 uppercase tracking-wider">Syncing Passbook...</p>
+                <p id="loadingMessage" class="text-xs font-bold text-slate-900 uppercase tracking-wider">Syncing GRAS Passbook...</p>
                 <p class="text-[10px] text-slate-500 font-medium">Please wait while the server updates</p>
             </div>
         </div>
     </div>
 
-    <!-- Main Container -->
+    <!-- Main Viewport -->
     <div id="customerView" class="max-w-md mx-auto w-full p-3 sm:p-4 flex-1">
         <div>
             <!-- Brand Header -->
@@ -105,13 +105,13 @@
                     <div class="absolute -top-6 sm:-top-7 left-1/2 -translate-x-1/2 w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-white shadow-md overflow-hidden bg-white">
                         <img src="https://i.pinimg.com/736x/9f/08/47/9f0847af5e7a99e2bef8814fa1416357.jpg" alt="Logo" class="w-full h-full object-cover">
                     </div>
-                    <h1 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight uppercase">Golden Rose Magic</h1>
-                    <p class="text-xs font-semibold text-amber-700 tracking-wider mt-0.5">For Easy Jewellery Purchase</p>
-                    <p class="text-[10px] text-slate-400 uppercase tracking-widest mt-0.5 sm:mt-1">Suman Jewellers Scheme Portal</p>
+                    <h1 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight uppercase">Golden Rose Assured</h1>
+                    <p class="text-xs font-semibold text-amber-700 tracking-wider mt-0.5">12 + 1 Assured Jewellery Purchase Scheme</p>
+                    <p class="text-[10px] text-slate-400 uppercase tracking-widest mt-0.5 sm:mt-1">Suman Jewellers Portal</p>
                 </div>
             </header>
 
-            <!-- Auth & Login Screens -->
+            <!-- Authentication Screen -->
             <div id="authContainer">
                 <!-- Step 1: Mobile -->
                 <div id="phoneSection" class="reveal bg-white rounded-2xl shadow-sm p-4 sm:p-5 border border-slate-200 mb-4 sm:mb-5 space-y-3.5">
@@ -120,10 +120,10 @@
                         <input type="tel" id="phoneInput" placeholder="Enter 10-Digit Mobile Number" maxlength="10" class="w-full px-3.5 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-600 focus:bg-white transition-all font-mono">
                     </div>
                     <button onclick="handlePhoneContinue()" id="btnPhoneContinue" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider transition-all cursor-pointer">
-                        Access GRMS Passbook
+                        Access GRAS Passbook
                     </button>
 
-                    <!-- Ofbuzz Signature Badge -->
+                    <!-- Signature Badge -->
                     <div class="pt-2 flex items-center justify-center gap-1.5 opacity-75 hover:opacity-100 transition-opacity">
                         <img src="https://i.pinimg.com/736x/bd/d0/5c/bdd05c94afb66b5a72f5e17a7a879ab3.jpg" alt="Ofbuzz Logo" class="w-3.5 h-3.5 rounded-full object-cover border border-slate-300">
                         <span class="text-[9px] font-semibold text-slate-500 uppercase tracking-wider">
@@ -154,7 +154,7 @@
                 <div id="firstTimeMpinSection" class="hidden-view bg-white rounded-2xl shadow-sm p-4 sm:p-5 border border-slate-200 mb-4 sm:mb-5 space-y-3.5">
                     <div class="text-center">
                         <h3 class="text-sm sm:text-base font-bold text-slate-900">Set Security 4-Digit MPIN</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">Welcome! Create a secure PIN for future logins.</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Create a 4-digit PIN for future logins.</p>
                     </div>
                     <div class="space-y-2.5">
                         <input type="password" id="firstMpin1" placeholder="Enter 4-Digit MPIN" maxlength="4" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-center font-mono text-lg font-bold tracking-widest">
@@ -167,7 +167,7 @@
                 <div id="forgotMpinSection" class="hidden-view bg-white rounded-2xl shadow-sm p-4 sm:p-5 border border-slate-200 mb-4 sm:mb-5 space-y-3.5">
                     <div class="text-center">
                         <h3 class="text-sm sm:text-base font-bold text-slate-900">Reset Security MPIN</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">Request your old MPIN directly to your registered email.</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Request your old MPIN to your registered email.</p>
                     </div>
                     <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
                         <button onclick="requestCurrentMpinRecovery()" id="btnRequestOldMpin" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider cursor-pointer">
@@ -185,16 +185,16 @@
 
                 <!-- Multi-Account Selector -->
                 <div id="multiKittyWrapper" class="hidden-view bg-amber-50 p-4 rounded-2xl border border-amber-200 space-y-3 mb-4 sm:mb-5">
-                    <label class="text-[11px] font-bold text-amber-900 uppercase tracking-wider block">Multiple GRMS Plans Linked</label>
+                    <label class="text-[11px] font-bold text-amber-900 uppercase tracking-wider block">Multiple GRAS Accounts Linked</label>
                     <select id="kittySelect" class="w-full px-3 py-2.5 bg-white border border-amber-300 rounded-xl text-sm font-semibold text-slate-900"></select>
                     <button onclick="confirmSelectedKitty()" class="w-full bg-slate-900 text-white font-semibold py-2.5 rounded-xl text-xs cursor-pointer">Open Selected Account</button>
                 </div>
             </div>
 
-            <!-- Dedicated Passbook -->
+            <!-- Passbook Container -->
             <div id="passbookContainer" class="hidden-view space-y-4">
                 
-                <!-- Customer Scheme Card -->
+                <!-- Customer Scheme Profile Card -->
                 <div class="reveal bg-slate-900 text-white rounded-2xl p-4 sm:p-5 shadow-sm relative overflow-hidden border border-slate-800">
                     <div class="space-y-3">
                         <div class="flex justify-between items-start">
@@ -204,7 +204,7 @@
                             </div>
                             <div class="flex items-center gap-1.5 sm:gap-2">
                                 <span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] sm:text-[10px] uppercase font-bold px-2 py-0.5 rounded flex items-center gap-1.5">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> GRMS Active
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> GRAS 12+1
                                 </span>
                                 <button onclick="logoutCustomer()" class="text-[9px] sm:text-[10px] bg-slate-800 hover:bg-rose-900/60 text-slate-300 px-2 py-0.5 rounded cursor-pointer">
                                     Logout
@@ -214,7 +214,7 @@
                         
                         <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800 text-[10px] sm:text-[11px]">
                             <div><span class="text-slate-500 block text-[9px] uppercase font-bold">A/C Code:</span> <span id="lblAcCode" class="font-bold font-mono text-amber-400">-</span></div>
-                            <div><span class="text-slate-500 block text-[9px] uppercase font-bold">Token ID:</span> <span id="lblCustId" class="font-semibold font-mono text-slate-200">-</span></div>
+                            <div><span class="text-slate-500 block text-[9px] uppercase font-bold">Token No:</span> <span id="lblTokenNo" class="font-semibold font-mono text-slate-200">-</span></div>
                             <div><span class="text-slate-500 block text-[9px] uppercase font-bold">Join Date:</span> <span id="lblDoj" class="font-semibold font-mono text-slate-200">-</span></div>
                         </div>
 
@@ -231,56 +231,43 @@
                     </div>
                 </div>
 
-                <!-- Accumulated 22K Gold Weight Card -->
-                <div class="reveal bg-white border border-slate-200 text-slate-900 rounded-2xl p-4 shadow-sm space-y-2">
-                    <div class="flex justify-between items-center">
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">
-                            Total Booked Gold Weight (22K)
-                        </h4>
-                        <span class="text-[10px] font-semibold text-slate-400 uppercase">Live Accumulated</span>
-                    </div>
-                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
-                        <span id="lblTotalGoldGrams" class="text-xl sm:text-2xl font-black text-slate-900 font-mono">0.000 g</span>
-                    </div>
-                </div>
-
-                <!-- Maturity Projection Card -->
-                <div id="rewardCard" class="reveal bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+                <!-- Assured 12+1 Valuation Card -->
+                <div class="reveal bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
                     <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-                        <span class="text-[11px] sm:text-xs font-bold text-slate-900 uppercase tracking-wider">Maturity Projection (11 Months)</span>
-                        <span id="badgeWinnerStatus" class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">Non-Winner</span>
+                        <span class="text-[11px] sm:text-xs font-bold text-slate-900 uppercase tracking-wider">Maturity Jewellery Value (12 + 1)</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">+1 Month Assured Bonus</span>
                     </div>
                     <div class="grid grid-cols-2 gap-2 sm:gap-3 text-center">
                         <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                            <span class="text-[9px] sm:text-[10px] text-slate-500 uppercase block font-semibold">Draw Bonus / Interest</span>
-                            <span id="lblRewardBenefit" class="text-xs sm:text-sm font-black text-emerald-600 font-mono">+₹0</span>
+                            <span class="text-[9px] sm:text-[10px] text-slate-500 uppercase block font-semibold">13th Month We Pay</span>
+                            <span id="lblJewellerBonus" class="text-xs sm:text-sm font-black text-emerald-600 font-mono">+₹0</span>
                         </div>
                         <div class="bg-amber-50 p-2.5 rounded-xl border border-amber-100">
-                            <span class="text-[9px] sm:text-[10px] text-amber-800 uppercase block font-semibold">Total Maturity Value</span>
-                            <span id="lblTotalMaturity" class="text-xs sm:text-sm font-black text-amber-900 font-mono">₹0</span>
+                            <span class="text-[9px] sm:text-[10px] text-amber-800 uppercase block font-semibold">Total Jewellery Worth</span>
+                            <span id="lblTotalJewelleryWorth" class="text-xs sm:text-sm font-black text-amber-900 font-mono">₹0</span>
                         </div>
                     </div>
-                    <p id="lblDrawDetails" class="text-[10px] sm:text-[11px] text-slate-500 text-center italic leading-tight"></p>
+                    <p id="lblDueScheduleNotice" class="text-[10px] sm:text-[11px] text-slate-500 text-center italic leading-tight"></p>
                 </div>
 
-                <!-- 11-Month Sequential Installment Grid -->
+                <!-- 12-Month Sequential Ledger Grid -->
                 <div class="reveal bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
                     <div class="flex justify-between items-center mb-3">
                         <div>
-                            <p class="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Installment Ledger (11 Months)</p>
+                            <p class="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Installment Ledger (12 Months)</p>
                             <p class="text-[10px] text-amber-800 font-medium">Sequential payment strictly required</p>
                         </div>
-                        <span class="text-[10px] text-slate-400">Due: 15th monthly</span>
+                        <span id="lblDueCutoffBadge" class="text-[10px] text-slate-500 font-semibold">-</span>
                     </div>
                     <div id="gridWrapper" class="grid grid-cols-3 sm:grid-cols-4 gap-2"></div>
                 </div>
 
-                <!-- Action Buttons -->
+                <!-- Action Desk -->
                 <div class="reveal space-y-2">
                     <div class="bg-white rounded-xl p-3.5 sm:p-4 border border-slate-200 flex items-center justify-between shadow-sm gap-2">
                         <div>
                             <h4 class="text-xs font-bold text-slate-900">Showroom Verification Desk</h4>
-                            <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Need help with draw dates or passbook?</p>
+                            <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Need help with maturity or passbook entries?</p>
                         </div>
                         <a id="supportLink" href="#" target="_blank" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3 py-2 rounded-lg transition-all cursor-pointer shrink-0">
                             Contact Desk
@@ -288,7 +275,7 @@
                     </div>
 
                     <button onclick="openTermsModal()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold py-3 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5">
-                        View Scheme Terms &amp; Conditions
+                        View Scheme Terms &amp; Conditions (GRAS)
                     </button>
                 </div>
             </div>
@@ -302,37 +289,31 @@
                 <div class="border-b border-slate-100 pb-2.5 mb-2.5 flex justify-between items-center">
                     <div>
                         <h3 class="text-xs sm:text-sm font-black text-slate-900 uppercase">Terms &amp; Conditions</h3>
-                        <p class="text-[10px] sm:text-[11px] text-amber-800 font-semibold">Golden Rose Magic Scheme (GRMS)</p>
+                        <p class="text-[10px] sm:text-[11px] text-amber-800 font-semibold">Golden Rose Assured Scheme (GRAS 12+1)</p>
                     </div>
                     <button onclick="closeTermsModal()" class="text-slate-400 hover:text-slate-700 font-bold text-xl cursor-pointer p-1">&times;</button>
                 </div>
                 <div class="overflow-y-auto max-h-[55vh] pr-1.5">
                     <ol class="text-[10px] sm:text-[11px] text-slate-600 space-y-2 list-decimal pl-4 leading-relaxed text-justify">
-                        <li>For Enrollment in Golden Rose Magic Scheme (GRMS) you must duly fill in &amp; sign the application form and deposit it at the Showroom with two photographs and a copy of any one official identity card document. Collect the Passbook and keep it in safe custody.</li>
-                        <li><strong>Key Terms:</strong>
-                            <ul class="list-disc pl-4 mt-1 space-y-0.5 text-slate-500">
-                                <li><em>Monthly Installment:</em> Amount to be given by participants to Suman Jewellers every month.</li>
-                                <li><em>Principal Amount:</em> Total installment sum paid by participant across 11 months.</li>
-                                <li><em>Interest Amount:</em> Lump-sum bonus provided upon maturity for non-winners.</li>
-                                <li><em>Winner:</em> Member who wins the lucky draw during the scheme tenure.</li>
+                        <li><strong>Enrollment:</strong> You must duly fill in &amp; sign the application form and deposit it at the Showroom with two photographs and a copy of any one identity card document[cite: 1]. Collect the Passbook and keep it in safe custody[cite: 1].</li>
+                        <li><strong>Installment Amount:</strong> Monthly installment is in multiples of Rs. 1,000/- (Minimum Rs. 2,000/-)[cite: 1]. You can pay installment amounts in multiples of the scheme opted for Golden Rose Assured Scheme[cite: 1].</li>
+                        <li><strong>Payment Mode:</strong> The first installment must be paid by cash, card, or UPI at our Showroom[cite: 1]. Subsequent monthly installment payments can be made through Cash / Cheques / Post Dated Cheques (PDC) / Demand Draft / ECS / Online UPI[cite: 1]. Always verify the entry in your Passbook at the cash counter[cite: 1].</li>
+                        <li><strong>Cheque Policy:</strong> Only one cheque per account per month will be accepted[cite: 1]. No outstation cheques accepted[cite: 1]. In case of cheque dishonor, Rs. 350/- penalty will be charged per transaction[cite: 1].</li>
+                        <li><strong>Monthly Due Date:</strong>
+                            <ul class="list-disc pl-4 mt-0.5 space-y-0.5 text-slate-500">
+                                <li><strong>10th of every month:</strong> For all accounts opened from the 1st to 15th of a month[cite: 1].</li>
+                                <li><strong>25th of every month:</strong> For all accounts opened from the 16th to the end of a month[cite: 1].</li>
                             </ul>
                         </li>
-                        <li>In case the passbook is lost, a fee of Rs.50/- will be charged for issuing a duplicate passbook.</li>
-                        <li>The GRMS will start on completion of 100 members and the tenure of the scheme will be 11 months. Every month there will be a draw continuing continuously for 11 months up to maturity. The draw will be held between the 21st and 25th of every calendar month.</li>
-                        <li>Every month one winner will receive Rs.15,000/- (for Rs.8,000/- monthly plan) or Rs.10,000/- (for Rs.5,000/- monthly plan). The amount is added on maturity to the principal amount after 11 months (i.e. one winner every month).</li>
-                        <li>The scheme continues for the winner and the winner remains fully eligible for all subsequent draws up to maturity. Any participant, including previous winners, can win multiple times.</li>
-                        <li>You agree to receive official communications via Phone Call, SMS, or WhatsApp on numbers registered in the Passbook.</li>
-                        <li>You are requested to attend the GRMS Draw in person to inspect that the process is fair and transparent. After the draw is conducted, Suman Jewellers will not be responsible for any objections.</li>
-                        <li>You are requested to inform the showroom in advance about your attendance for the draw by the 18th–20th of each month. Inquire for the exact date, timing, and venue.</li>
-                        <li><strong>Maturity &amp; Interest Rules:</strong>
-                            <ul class="list-disc pl-4 mt-1 space-y-0.5 text-slate-500">
-                                <li><strong>Rs.8,000 Scheme (Non-Winners):</strong> 11 &times; Rs.8,000 = Rs.88,000 + Rs.3,000 (Interest) = <strong>Rs.91,000/-</strong> maturity.</li>
-                                <li><strong>Rs.5,000 Scheme (Non-Winners):</strong> 11 &times; Rs.5,000 = Rs.55,000 + Rs.2,000 (Interest) = <strong>Rs.57,000/-</strong> maturity.</li>
-                                <li><em>Note:</em> The fixed Interest Amount is not applicable if a participant wins a draw; the draw prize replaces interest.</li>
+                        <li><strong>Continuous Payments &amp; Extension:</strong> You must pay installments continuously for 12 months to be eligible for the 13th-month bonus[cite: 1]. If you miss any installment, the maturity date extends accordingly (maximum up to 3 skipped months)[cite: 1]. If missing more than 3 months, the scheme pre-matures without bonus eligibility[cite: 1].</li>
+                        <li><strong>12+1 Assured Bonus Structure:</strong> Suman Jewellers contributes the final installment as your bonus[cite: 1]:
+                            <ul class="list-disc pl-4 mt-0.5 space-y-0.5 text-slate-500">
+                                <li>Rs. 3,000/month &times; 12 = Rs. 36,000 + Rs. 3,000 (Bonus) = <strong>Rs. 39,000/- Jewellery Worth</strong>[cite: 2]</li>
+                                <li>Rs. 5,000/month &times; 12 = Rs. 60,000 + Rs. 5,000 (Bonus) = <strong>Rs. 65,000/- Jewellery Worth</strong>[cite: 1, 2]</li>
+                                <li>Rs. 10,000/month &times; 12 = Rs. 1,20,000 + Rs. 10,000 (Bonus) = <strong>Rs. 1,30,000/- Jewellery Worth</strong>[cite: 2]</li>
                             </ul>
                         </li>
-                        <li>You must pay the first installment by cash or card at the Showroom. Subsequent monthly installments can be made via Cash / Cheque / PDC / Demand Draft / ECS / Online UPI. Always obtain a computerized receipt at the cash counter. Suman Jewellers is not responsible for payments made to unauthorized individuals.</li>
-                        <li>Payments can be made in multiples of the monthly installment. The monthly due date is the <strong>15th of every calendar month</strong>. For online deposits (NEFT/ECS/UPI), inform the showroom with the transaction UTR number.</li>
+                        <li><strong>Delivery Pricing:</strong> The price of jewellery shall be at the actual market rate at the time of delivery upon maturity, not on the enrollment date[cite: 1].</li>
                     </ol>
                 </div>
             </div>
@@ -347,31 +328,31 @@
         <div class="bg-white rounded-2xl p-4 sm:p-6 w-full max-w-md shadow-xl border border-slate-100 max-h-[90vh] overflow-y-auto animate-bounce-short">
             <div class="border-b border-slate-100 pb-3 mb-3.5 flex justify-between items-start">
                 <div>
-                    <h3 class="text-sm sm:text-base font-bold text-slate-900">GRMS Installment Payment</h3>
+                    <h3 class="text-sm sm:text-base font-bold text-slate-900">GRAS Installment Payment</h3>
                     <p id="modalMonthTarget" class="text-xs font-medium text-slate-500 mt-0.5">Month Allocation</p>
                 </div>
                 <button onclick="closePaymentModal()" class="text-slate-400 hover:text-slate-700 font-bold text-lg cursor-pointer p-1">&times;</button>
             </div>
 
-            <!-- Multi-Kitty Selection -->
+            <!-- Multi-Account Payment Selector -->
             <div id="multiKittySelectionContainer" class="hidden-view mb-3.5 bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
                 <label class="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">
-                    Select GRMS Accounts To Include In Payment:
+                    Select GRAS Accounts To Include In Payment:
                 </label>
                 <div id="multiKittyCheckboxList" class="space-y-1.5 max-h-32 overflow-y-auto pt-1"></div>
             </div>
 
-            <!-- UPI App Button -->
+            <!-- UPI Deep Link -->
             <a id="btnUpiAppPay" href="#" class="w-full mb-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.98]">
                 Pay Via UPI App (GPay / PhonePe / Paytm)
             </a>
 
-            <!-- Bank Details Toggle -->
+            <!-- Payment Mode Toggle -->
             <button onclick="togglePaymentMethodView()" id="btnPaymentToggle" class="w-full mb-3.5 bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold py-2 rounded-xl transition-all cursor-pointer text-center">
                 Switch to Bank Account Credentials
             </button>
 
-            <!-- UPI QR Code -->
+            <!-- UPI QR Display -->
             <div id="channelUpiView" class="bg-slate-50 rounded-xl p-3.5 border border-slate-200 flex flex-col items-center justify-center mb-3.5">
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Scan Official Showroom QR Code</p>
                 <div class="w-32 h-32 sm:w-36 sm:h-36 bg-white p-2 rounded-lg border border-slate-200 shadow-sm flex items-center justify-center">
@@ -382,7 +363,7 @@
                 </button>
             </div>
 
-            <!-- Bank Credentials -->
+            <!-- Showroom Bank Account Details -->
             <div id="channelBankView" class="hidden-view bg-slate-50 rounded-xl p-3.5 border border-slate-200 mb-3.5 space-y-2 text-xs text-slate-800">
                 <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-1">Showroom Bank Transfer Credentials</p>
                 <div><span class="text-slate-400 font-medium block text-[9px] uppercase">Bank Name</span><span class="font-bold">State Bank of India</span></div>
@@ -393,7 +374,7 @@
                 </div>
             </div>
 
-            <!-- Proof Submission Form -->
+            <!-- Proof Upload Fields -->
             <div class="space-y-3 mb-4">
                 <div>
                     <label class="text-[11px] font-bold text-slate-500 uppercase block mb-1">Transaction UTR Key / Ref Number</label>
@@ -445,12 +426,12 @@
                     </ul>
                 </div>
 
-                <!-- Col 3: Kitty Schemes -->
+                <!-- Col 3: Scheme Portals -->
                 <div class="space-y-2.5">
                     <h5 class="text-[11px] font-bold text-white uppercase tracking-wider">Kitty Portals</h5>
                     <ul class="space-y-2 text-[11px]">
-                        <li><a href="https://www.sumanjewellers.co.in/about/golden-rose-magic-scheme" target="_blank" class="hover:text-amber-400 transition-colors">11M Lucky Draw (GRMS)</a></li>
                         <li><a href="https://www.sumanjewellers.co.in/about/golden-rose-assured" target="_blank" class="hover:text-amber-400 transition-colors">12+1 Assured Kitty (GRAS)</a></li>
+                        <li><a href="https://www.sumanjewellers.co.in/about/golden-rose-magic-scheme" target="_blank" class="hover:text-amber-400 transition-colors">11M Lucky Draw (GRMS)</a></li>
                         <li><a href="https://www.sumanjewellers.co.in/about/contact-us" target="_blank" class="hover:text-amber-400 transition-colors">Help Desk &amp; Inquiry</a></li>
                     </ul>
                 </div>
@@ -488,14 +469,14 @@
         </div>
     </footer>
 
-    <!-- Global App Engine Scripts -->
+    <!-- GRAS Application Engine -->
     <script>
         const config = {
             name: "Suman Jewellers",
             upiVpa: "vyapar.178552646415@hdfcbank",
-            scriptUrl: "https://script.google.com/macros/s/AKfycbyds-Y0vhWOc4S2HnQUQGaiuKRo3n_F8vL8LiVsfw0hEZpEvKjubDosJNxv-_xwotkoEQ/exec",
+            scriptUrl: "https://script.google.com/macros/s/AKfycbx0KKUYsLjlckxTzfVgpsVmIhyAWLBupuPHuk1xdd4CvHpAuQVRxRYRqwBu6irgey2r/exec",
             whatsapp: "918052473033",
-            schemeMonths: 11
+            schemeMonths: 12
         };
 
         const SCRIPT_URL = config.scriptUrl;
@@ -503,7 +484,6 @@
         let globalCustomerPhone = null;
         let globalAcCode = null;
         let globalMonthlyAmount = 0;
-        let globalWinCount = 0;
         let activeMatches = [];
         let optimisticPendingMonths = new Set();
         let isSyncingActive = false;
@@ -680,7 +660,7 @@
             .then(r => r.json())
             .then(res => {
                 hideLoader();
-                if (!res || !res.results || res.results.length === 0) return alert("No GRMS record found.");
+                if (!res || !res.results || res.results.length === 0) return alert("No GRAS record found.");
                 activeMatches = res.results;
 
                 if (activeMatches.length === 1) {
@@ -692,7 +672,7 @@
                     const select = document.getElementById('kittySelect');
                     select.innerHTML = "";
                     activeMatches.forEach(item => {
-                        select.innerHTML += `<option value="${item.acCode}">A/C Code: ${item.acCode} - ${item.name}</option>`;
+                        select.innerHTML += `<option value="${item.acCode}">A/C: ${item.acCode} - ${item.name} (₹${item.monthlyAmount})</option>`;
                     });
                     wrapper.classList.remove('hidden-view');
                 }
@@ -719,7 +699,7 @@
         function executePassbookRender(phone, acCode, isSilentSync = false) {
             if (isSyncingActive) return;
             isSyncingActive = true;
-            if (!isSilentSync) showLoader("Retrieving Ledger...");
+            if (!isSilentSync) showLoader("Retrieving GRAS Ledger...");
 
             fetch(`${SCRIPT_URL}?action=getData&phone=${encodeURIComponent(phone)}&kittyNumber=${encodeURIComponent(acCode)}&_ts=${Date.now()}`, {
                 method: "GET",
@@ -735,8 +715,7 @@
                 
                 globalCustomerPhone = data.profile.phone;
                 globalAcCode = data.profile.acCode;
-                globalMonthlyAmount = Number(data.profile.monthlyAmount) || 0;
-                globalWinCount = Number(data.profile.winCount) || 0;
+                globalMonthlyAmount = Number(data.profile.monthlyAmount) || 5000;
 
                 nextAllowedMonth = data.nextPayableMonth || 1;
 
@@ -744,54 +723,33 @@
                 document.getElementById('custPhone').innerText = "+91 " + data.profile.phone;
                 document.getElementById('custAmount').innerText = "₹" + globalMonthlyAmount.toLocaleString('en-IN');
                 document.getElementById('lblAcCode').innerText = data.profile.acCode;
-                document.getElementById('lblCustId').innerText = data.profile.customerId;
+                document.getElementById('lblTokenNo').innerText = data.profile.tokenNo || "-";
                 document.getElementById('lblDoj').innerText = data.profile.doj || "-";
 
-                document.getElementById('supportLink').href = `https://wa.me/${config.whatsapp}?text=Hello%20Suman%20Jewellers,%20inquiring%20about%20GRMS%20A/C%20${encodeURIComponent(data.profile.acCode)}.`;
+                document.getElementById('lblDueCutoffBadge').innerText = "Due: " + data.profile.dueDayText;
+                document.getElementById('lblDueScheduleNotice').innerText = `Installment Due Date: ${data.profile.dueDayText}. Clear 12 months consecutively to receive 13th-month bonus worth ₹${globalMonthlyAmount.toLocaleString('en-IN')}.`;
+
+                document.getElementById('supportLink').href = `https://wa.me/${config.whatsapp}?text=Hello%20Suman%20Jewellers,%20inquiring%20about%20GRAS%20A/C%20${encodeURIComponent(data.profile.acCode)}.`;
 
                 const userTransactions = data.transactions || [];
                 let paidMonthsCount = 0;
-                let accumulatedGoldWeight = 0;
 
                 userTransactions.forEach(t => {
-                    if (t.status === "Paid") {
-                        paidMonthsCount++;
-                        accumulatedGoldWeight += Number(t.bookedGrams) || 0;
-                    }
-                    if (t.status === "Pending" || t.status === "Paid" || t.status === "Reviewed") {
+                    if (t.status === "Paid") paidMonthsCount++;
+                    if (t.status === "Pending" || t.status === "Paid") {
                         optimisticPendingMonths.delete(Number(t.month));
                     }
                 });
 
                 let principalPaid = paidMonthsCount * globalMonthlyAmount;
                 document.getElementById('custLiveBalance').innerText = "₹" + principalPaid.toLocaleString('en-IN');
-                document.getElementById('lblTotalGoldGrams').innerText = `${accumulatedGoldWeight.toFixed(3)} g`;
 
-                let totalMaturity = 0;
-                let full11Principal = 11 * globalMonthlyAmount;
-                const badge = document.getElementById('badgeWinnerStatus');
+                let twelveMonthsPrincipal = 12 * globalMonthlyAmount;
+                let assuredBonus = globalMonthlyAmount;
+                let totalJewelleryWorth = twelveMonthsPrincipal + assuredBonus;
 
-                if (globalWinCount > 0) {
-                    badge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800";
-                    let prizeWon = 0;
-                    if (globalWinCount === 1) { prizeWon = 15000; badge.innerText = "1x Draw Winner (+₹15,000 Gold)"; }
-                    else if (globalWinCount === 2) { prizeWon = 30000; badge.innerText = "2x Draw Winner (+₹30,000 Gold)"; }
-                    else { prizeWon = 45000; badge.innerText = "3x Draw Winner (+₹45,000 Gold)"; }
-
-                    totalMaturity = full11Principal + prizeWon;
-                    document.getElementById('lblRewardBenefit').innerText = `+₹${prizeWon.toLocaleString('en-IN')}`;
-                    document.getElementById('lblTotalMaturity').innerText = `₹${totalMaturity.toLocaleString('en-IN')}`;
-                    document.getElementById('lblDrawDetails').innerText = `Draw prize of ₹${prizeWon.toLocaleString('en-IN')} converted to 22K Gold and credited with Month 11 payment.`;
-                } else {
-                    badge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700";
-                    badge.innerText = "Non-Winner Plan";
-                    let giftBonus = (globalMonthlyAmount === 8000) ? 3000 : 2000;
-                    totalMaturity = full11Principal + giftBonus;
-
-                    document.getElementById('lblRewardBenefit').innerText = `+₹${giftBonus.toLocaleString('en-IN')}`;
-                    document.getElementById('lblTotalMaturity').innerText = `₹${totalMaturity.toLocaleString('en-IN')}`;
-                    document.getElementById('lblDrawDetails').innerText = `Non-Winner Gift Bonus of ₹${giftBonus.toLocaleString('en-IN')} converted to 22K Gold upon Month 11 payment.`;
-                }
+                document.getElementById('lblJewellerBonus').innerText = "+₹" + assuredBonus.toLocaleString('en-IN');
+                document.getElementById('lblTotalJewelleryWorth').innerText = "₹" + totalJewelleryWorth.toLocaleString('en-IN');
 
                 const grid = document.getElementById('gridWrapper');
                 grid.innerHTML = "";
@@ -801,10 +759,9 @@
                     let label = "Pay Now", style = "", action = "";
 
                     if (tx && tx.status === "Paid") {
-                        let gWeight = (Number(tx.bookedGrams) || 0).toFixed(3);
-                        label = (Number(gWeight) > 0) ? `Paid (${gWeight}g)` : `Paid`;
+                        label = "Paid";
                         style = "bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold text-[10px]";
-                    } else if ((tx && (tx.status === "Pending" || tx.status === "Reviewed")) || optimisticPendingMonths.has(m)) {
+                    } else if ((tx && tx.status === "Pending") || optimisticPendingMonths.has(m)) {
                         label = "In Review";
                         style = "bg-amber-50 border border-amber-200 text-amber-800 animate-pulse font-semibold";
                     } else if (m === nextAllowedMonth && !data.isSchemeComplete) {
@@ -909,7 +866,7 @@
                 totalAmountToPay = aggregate > 0 ? aggregate : globalMonthlyAmount;
             }
 
-            const note = encodeURIComponent(`GRMS M${currentSelectedMonth} - ${selectedAcCodes.join(',')}`);
+            const note = encodeURIComponent(`GRAS M${currentSelectedMonth} - ${selectedAcCodes.join(',')}`);
             const upiUrl = `upi://pay?pa=${config.upiVpa}&pn=${encodeURIComponent(config.name)}&am=${totalAmountToPay}&cu=INR&tn=${note}`;
             document.getElementById('btnUpiAppPay').href = upiUrl;
 
@@ -1004,7 +961,7 @@
             }
         }
 
-        // Interactive Cursor and Scroll Reveal Observers
+        // Custom Cursor & Reveal Animations Observer
         document.addEventListener('DOMContentLoaded', () => {
             const dot = document.getElementById('cursorDot');
             const ring = document.getElementById('cursorRing');
@@ -1027,8 +984,8 @@
                 }
                 requestAnimationFrame(renderRing);
 
-                const interactiveSelector = 'a, button, input, select, textarea, [onclick]';
-                document.querySelectorAll(interactiveSelector).forEach((el) => {
+                const interactiveElements = 'a, button, input, select, textarea, [onclick]';
+                document.querySelectorAll(interactiveElements).forEach((el) => {
                     el.addEventListener('mouseenter', () => ring.classList.add('active-hover'));
                     el.addEventListener('mouseleave', () => ring.classList.remove('active-hover'));
                 });
