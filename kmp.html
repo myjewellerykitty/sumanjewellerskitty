@@ -8,6 +8,7 @@
     <style>
         .hidden-view { display: none !important; }
         .overflow-x-auto { -webkit-overflow-scrolling: touch; }
+
         @keyframes spinAnimation {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
@@ -15,6 +16,7 @@
         .enterprise-spinner {
             animation: spinAnimation 0.9s linear infinite;
         }
+
         @keyframes popupEnter {
             from { opacity: 0; transform: scale(0.96) translateY(-6px); }
             to { opacity: 1; transform: scale(1) translateY(0); }
@@ -22,11 +24,67 @@
         .animate-popup {
             animation: popupEnter 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
+
+        /* Interactive Desktop Cursor */
+        @media (hover: hover) and (pointer: fine) {
+            * { cursor: none !important; }
+            .cursor-dot {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 6px;
+                height: 6px;
+                background-color: #b45309;
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 9999;
+                transform: translate(-50%, -50%);
+                transition: opacity 0.2s ease;
+            }
+            .cursor-ring {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 32px;
+                height: 32px;
+                border: 1.5px solid rgba(180, 83, 9, 0.55);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 9998;
+                transform: translate(-50%, -50%);
+                transition: width 0.2s ease, height 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+            }
+            .cursor-ring.active-hover {
+                width: 48px;
+                height: 48px;
+                border-color: #78350f;
+                background-color: rgba(245, 158, 11, 0.12);
+            }
+        }
+        @media (hover: none) or (pointer: coarse) {
+            .cursor-dot, .cursor-ring { display: none !important; }
+        }
+
+        /* Scroll-Triggered Reveal Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        .reveal.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 antialiased min-h-screen">
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col justify-between">
 
-    <!-- TOP-PINNED STATUS / LOADING INDICATOR -->
+    <!-- Interactive Desktop Cursor -->
+    <div id="cursorDot" class="cursor-dot"></div>
+    <div id="cursorRing" class="cursor-ring"></div>
+
+    <!-- Top-Pinned Status / Loading Indicator -->
     <div id="kmpLoader" class="hidden-view fixed top-3 right-3 sm:right-4 z-50">
         <div class="bg-slate-900 text-white rounded-xl py-2 px-3.5 sm:px-4 shadow-2xl border border-slate-700 flex items-center gap-2.5 animate-popup">
             <div class="w-4 h-4 border-2 border-slate-400 border-t-amber-400 rounded-full enterprise-spinner shrink-0"></div>
@@ -34,7 +92,7 @@
         </div>
     </div>
 
-    <!-- CONTEXTUAL IN-PAGE NOTIFICATION DIALOG -->
+    <!-- In-Page Alert Dialog -->
     <div id="uiAlertDialog" class="hidden-view fixed inset-0 bg-slate-950/40 backdrop-blur-xs flex items-start justify-center pt-8 sm:pt-14 px-3 z-50">
         <div class="bg-white rounded-xl p-4 sm:p-5 shadow-2xl border border-slate-200 max-w-sm w-full animate-popup">
             <h3 id="uiAlertTitle" class="text-xs sm:text-sm font-bold text-slate-900 uppercase mb-1">Notification</h3>
@@ -45,7 +103,7 @@
         </div>
     </div>
 
-    <!-- CONTEXTUAL IN-PAGE CONFIRMATION DIALOG -->
+    <!-- In-Page Confirmation Dialog -->
     <div id="uiConfirmDialog" class="hidden-view fixed inset-0 bg-slate-950/40 backdrop-blur-xs flex items-start justify-center pt-8 sm:pt-14 px-3 z-50">
         <div class="bg-white rounded-xl p-4 sm:p-5 shadow-2xl border border-slate-200 max-w-sm w-full animate-popup">
             <h3 id="uiConfirmTitle" class="text-xs sm:text-sm font-bold text-slate-900 uppercase mb-1">Confirmation Required</h3>
@@ -61,7 +119,7 @@
         </div>
     </div>
 
-    <!-- CONTEXTUAL IN-PAGE INPUT PROMPT -->
+    <!-- In-Page Input Prompt Dialog -->
     <div id="uiPromptDialog" class="hidden-view fixed inset-0 bg-slate-950/40 backdrop-blur-xs flex items-start justify-center pt-8 sm:pt-14 px-3 z-50 overflow-y-auto">
         <div class="bg-white rounded-xl p-4 sm:p-5 shadow-2xl border border-slate-200 max-w-sm w-full animate-popup">
             <h3 id="uiPromptTitle" class="text-xs sm:text-sm font-bold text-slate-900 uppercase mb-1">Required Input</h3>
@@ -80,12 +138,12 @@
         </div>
     </div>
 
-    <!-- MAIN INTERFACE WITH HEADER-MOUNTED AUTHENTICATION -->
-    <div class="min-h-screen flex flex-col">
+    <!-- Main Navigation Bar -->
+    <div class="min-h-screen flex flex-col flex-1">
         <header class="bg-slate-900 text-white sticky top-0 z-30 shadow-sm border-b border-slate-800">
             <div class="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex flex-col lg:flex-row justify-between items-center gap-2.5 sm:gap-3">
                 
-                <!-- BRAND IDENTIFIER -->
+                <!-- Brand Identifier -->
                 <div class="flex items-center gap-2.5 w-full lg:w-auto justify-between lg:justify-start">
                     <div class="flex items-center gap-2">
                         <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-500 flex items-center justify-center font-black text-slate-950 text-xs">SJ</div>
@@ -95,14 +153,14 @@
                         </div>
                     </div>
 
-                    <!-- SESSION BADGE -->
+                    <!-- Session Status Badge -->
                     <div id="sessionBadgeContainer" class="hidden-view flex items-center gap-1.5 sm:gap-2">
                         <span id="kmpRoleBadge" class="text-[9px] sm:text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-800 text-slate-300">Evaluating...</span>
                         <span class="text-[10px] sm:text-[11px] text-slate-400">User: <strong id="lblActiveUser" class="text-white font-mono">-</strong></span>
                     </div>
                 </div>
 
-                <!-- 1. HEADER-INTEGRATED LOGIN BAR -->
+                <!-- Header-Integrated Login Form -->
                 <div id="headerLoginBar" class="w-full lg:w-auto flex items-center justify-end">
                     <form onsubmit="handleKmpLogin(event)" class="flex items-center gap-1.5 sm:gap-2 w-full lg:w-auto flex-wrap sm:flex-nowrap">
                         <input type="text" id="kmpUserInput" required placeholder="Username" class="bg-slate-800 border border-slate-700 text-white px-2.5 py-1.5 rounded-lg text-xs focus:ring-1 focus:ring-amber-500 focus:outline-none w-full sm:w-28 md:w-32">
@@ -113,7 +171,7 @@
                     </form>
                 </div>
 
-                <!-- 2. NAVIGATION BAR -->
+                <!-- Operations Navigation (Upon Login) -->
                 <div id="headerNavBar" class="hidden-view flex items-center gap-1 sm:gap-1.5 flex-wrap w-full lg:w-auto justify-start sm:justify-end">
                     <button onclick="switchKmpTab('members')" id="tabBtnMembers" class="bg-slate-800 text-white text-[11px] sm:text-xs font-semibold px-2.5 py-1.5 rounded-lg cursor-pointer transition-all">Directory</button>
                     <button onclick="switchKmpTab('approvals')" id="tabBtnApprovals" class="bg-slate-800 text-slate-400 text-[11px] sm:text-xs font-semibold px-2.5 py-1.5 rounded-lg cursor-pointer transition-all">Queue</button>
@@ -127,7 +185,7 @@
             </div>
         </header>
 
-        <!-- PORTAL RESTRICTED SCREEN (BEFORE LOGIN) -->
+        <!-- Unauthenticated Access Restriction -->
         <div id="loggedOutPlaceholder" class="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 text-center text-slate-500">
             <div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center mb-3">
                 <span class="text-xl font-mono text-slate-700 font-bold">#</span>
@@ -136,12 +194,12 @@
             <p class="text-xs text-slate-500 mt-1 max-w-sm">Please provide authorized operator credentials via the header login bar above to access records and permissions.</p>
         </div>
 
-        <!-- MAIN CONSOLE VIEWS -->
+        <!-- Main Console Views -->
         <main id="kmpMainView" class="hidden-view max-w-6xl mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6 flex-1 w-full">
 
-            <!-- TAB 1: MEMBERS DIRECTORY -->
+            <!-- Tab 1: Members Directory -->
             <div id="tabContentMembers" class="space-y-4 sm:space-y-6">
-                <section class="bg-white rounded-xl p-4 sm:p-5 border border-slate-200 shadow-sm">
+                <section class="reveal bg-white rounded-xl p-4 sm:p-5 border border-slate-200 shadow-sm">
                     <div class="flex justify-between items-center mb-2">
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-600">Database Search</label>
                         <button onclick="refreshCurrentLedger()" class="text-xs font-bold text-slate-700 hover:text-black transition-all cursor-pointer">
@@ -161,9 +219,9 @@
                     </div>
                 </section>
 
-                <!-- ACTIVE MEMBER PROFILE SECTION -->
+                <!-- Active Member Profile Section (No Lucky Draw Elements) -->
                 <section id="memberProfileSection" class="hidden-view space-y-4 sm:space-y-6">
-                    <div class="bg-slate-900 text-white rounded-xl p-4 sm:p-6 shadow-sm border border-slate-800">
+                    <div class="reveal bg-slate-900 text-white rounded-xl p-4 sm:p-6 shadow-sm border border-slate-800">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 border-b border-slate-800 pb-4 mb-4">
                             <div>
                                 <div class="flex items-center gap-2">
@@ -218,8 +276,8 @@
                         </div>
                     </div>
 
-                    <!-- LEDGER TABLE -->
-                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <!-- Ledger Table -->
+                    <div class="reveal bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                         <div class="p-3.5 sm:p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
                             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Scheme Ledger Statement (12 Months)</h3>
                             <span id="viewPaidRatio" class="text-xs font-semibold text-slate-500">0 / 12 Completed</span>
@@ -243,9 +301,9 @@
                 </section>
             </div>
 
-            <!-- TAB 2: PENDING APPROVALS QUEUE -->
+            <!-- Tab 2: Pending Approvals Queue -->
             <div id="tabContentApprovals" class="space-view space-y-3.5 sm:space-y-4 hidden-view">
-                <div class="flex justify-between items-center bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-sm">
+                <div class="reveal flex justify-between items-center bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-sm">
                     <div>
                         <h2 class="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-tight">Payment Verification Queue</h2>
                         <p class="text-[11px] text-slate-500">Tier 1: Staff Rate Review &rarr; Tier 2: Final Ledger Audit</p>
@@ -255,7 +313,7 @@
                     </button>
                 </div>
 
-                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="reveal bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead>
@@ -277,9 +335,9 @@
                 </div>
             </div>
 
-            <!-- TAB 3: ACCESS CONTROL (ADMINISTRATOR ONLY) -->
+            <!-- Tab 3: Access Control & Permissions -->
             <div id="tabContentUsers" class="space-view space-y-3.5 sm:space-y-4 hidden-view">
-                <div class="flex justify-between items-center bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-sm">
+                <div class="reveal flex justify-between items-center bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-sm">
                     <div>
                         <h2 class="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-tight">Access Control &amp; Roles</h2>
                         <p class="text-[11px] text-slate-500">Manage operator permissions, validation authority, and 2SV</p>
@@ -289,7 +347,7 @@
                     </button>
                 </div>
 
-                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="reveal bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead>
@@ -312,7 +370,7 @@
         </main>
     </div>
 
-    <!-- MODAL: ADD / EDIT STAFF PERMISSIONS (TOP-ANCHORED) -->
+    <!-- Modal: Add / Edit Staff Permissions -->
     <div id="userModal" class="hidden-view fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-start justify-center p-3 pt-4 sm:pt-8 z-50 overflow-y-auto">
         <div class="bg-white rounded-xl p-4 sm:p-6 w-full max-w-md shadow-2xl border border-slate-200 max-h-[85vh] overflow-y-auto animate-popup">
             <h3 id="userModalTitle" class="text-xs sm:text-sm font-bold text-slate-900 mb-3.5 uppercase">Configure Operator Privileges</h3>
@@ -354,7 +412,7 @@
         </div>
     </div>
 
-    <!-- MODAL: ENROLL NEW MEMBER (TOP-ANCHORED) -->
+    <!-- Modal: Enroll New Member -->
     <div id="addMemberModal" class="hidden-view fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-start justify-center p-3 pt-4 sm:pt-8 z-50 overflow-y-auto">
         <div class="bg-white rounded-xl p-4 sm:p-6 w-full max-w-md shadow-2xl border border-slate-200 max-h-[85vh] overflow-y-auto animate-popup">
             <div class="border-b border-slate-200 pb-2.5 mb-3 flex justify-between items-center">
@@ -404,7 +462,7 @@
         </div>
     </div>
 
-    <!-- MODAL: COUNTER DEPOSIT (TOP-ANCHORED) -->
+    <!-- Modal: Counter Deposit -->
     <div id="manualDepositModal" class="hidden-view fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-start justify-center p-3 pt-4 sm:pt-8 z-50 overflow-y-auto">
         <div class="bg-white rounded-xl p-4 sm:p-6 w-full max-w-md shadow-2xl border border-slate-200 max-h-[85vh] overflow-y-auto animate-popup">
             <div class="border-b border-slate-200 pb-2.5 mb-3 flex justify-between items-center">
@@ -450,7 +508,83 @@
         </div>
     </div>
 
-    <!-- CLIENT CONTROLLER -->
+    <!-- Standardized Luxury Multi-Column Footer -->
+    <footer class="reveal bg-slate-900 text-slate-300 border-t border-slate-800 mt-10 pt-10 pb-8 text-xs">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+                
+                <!-- Col 1: Brand Info -->
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded bg-amber-500 flex items-center justify-center font-black text-slate-950 text-[10px]">SJ</div>
+                        <span class="font-bold tracking-tight uppercase text-white">Suman Jewellers</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 leading-relaxed">
+                        Pure 22K Gold &amp; Certified Diamond jewellery crafted with heritage, trust, and transparent monthly kitty schemes since 1996.
+                    </p>
+                    <div class="pt-1">
+                        <a href="https://maps.app.goo.gl/iAv32xCsxuh1K7pa8" target="_blank" class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-amber-400 hover:text-amber-300 transition-colors">
+                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            <span>Visit Our Showroom</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Col 2: Showroom Directory -->
+                <div class="space-y-2.5">
+                    <h5 class="text-[11px] font-bold text-white uppercase tracking-wider">Explore</h5>
+                    <ul class="space-y-2 text-[11px]">
+                        <li><a href="https://www.sumanjewellers.co.in/collection" target="_blank" class="hover:text-amber-400 transition-colors">Jewellery Collection</a></li>
+                        <li><a href="https://maps.app.goo.gl/iAv32xCsxuh1K7pa8" target="_blank" class="hover:text-amber-400 transition-colors">Locate Store</a></li>
+                        <li><a href="https://www.sumanjewellers.co.in/about/blogs" target="_blank" class="hover:text-amber-400 transition-colors">Articles &amp; Blogs</a></li>
+                        <li><a href="https://www.sumanjewellers.co.in/about/contact-us" target="_blank" class="hover:text-amber-400 transition-colors">Contact Support</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Scheme Portals -->
+                <div class="space-y-2.5">
+                    <h5 class="text-[11px] font-bold text-white uppercase tracking-wider">Kitty Portals</h5>
+                    <ul class="space-y-2 text-[11px]">
+                        <li><a href="https://www.sumanjewellers.co.in/about/golden-rose-assured" target="_blank" class="hover:text-amber-400 transition-colors">12+1 Assured Kitty (GRAS)</a></li>
+                        <li><a href="https://www.sumanjewellers.co.in/about/golden-rose-magic-scheme" target="_blank" class="hover:text-amber-400 transition-colors">11M Lucky Draw (GRMS)</a></li>
+                        <li><a href="https://www.sumanjewellers.co.in/about/contact-us" target="_blank" class="hover:text-amber-400 transition-colors">Help Desk &amp; Inquiry</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Connect & Socials -->
+                <div class="space-y-3">
+                    <h5 class="text-[11px] font-bold text-white uppercase tracking-wider">Connect With Us</h5>
+                    <p class="text-[11px] text-slate-400">Direct Showroom Assistance:</p>
+                    <a href="https://wa.me/917840000934" target="_blank" class="inline-flex items-center gap-2 bg-emerald-700/80 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all">
+                        <svg class="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.043.072.043.419-.101.824z"/></svg>
+                        <span>WhatsApp Chat</span>
+                    </a>
+                    <div class="flex items-center gap-3 pt-1">
+                        <!-- Instagram -->
+                        <a href="https://www.instagram.com/sumanjewellers1996/" target="_blank" aria-label="Instagram" class="w-7 h-7 rounded-full bg-slate-800 hover:bg-amber-600 flex items-center justify-center text-slate-300 hover:text-white transition-all">
+                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                        </a>
+                        <!-- Facebook -->
+                        <a href="https://facebook.com" target="_blank" aria-label="Facebook" class="w-7 h-7 rounded-full bg-slate-800 hover:bg-amber-600 flex items-center justify-center text-slate-300 hover:text-white transition-all">
+                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg>
+                        </a>
+                        <!-- YouTube -->
+                        <a href="https://youtube.com" target="_blank" aria-label="YouTube" class="w-7 h-7 rounded-full bg-slate-800 hover:bg-amber-600 flex items-center justify-center text-slate-300 hover:text-white transition-all">
+                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Copyright -->
+            <div class="border-t border-slate-800 pt-5 flex flex-col sm:flex-row justify-between items-center gap-2 text-[10px] text-slate-500">
+                <p>&copy; 2026 Suman Jewellers. All rights reserved.</p>
+                <p class="tracking-wider uppercase font-semibold">An Ofbuzz Product &bull; Ofbuzz Technology</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Global App Engine Scripts -->
     <script>
         const config = {
             scriptUrl: "https://script.google.com/macros/s/AKfycbx0KKUYsLjlckxTzfVgpsVmIhyAWLBupuPHuk1xdd4CvHpAuQVRxRYRqwBu6irgey2r/exec",
@@ -466,7 +600,6 @@
         let activeConfirmResolver = null;
         let activePromptResolver = null;
 
-        // --- CONTEXTUAL IN-PAGE POPUPS ---
         function showLoader(msg = "Communicating with Database...") {
             document.getElementById('kmpLoaderMsg').innerText = msg;
             document.getElementById('kmpLoader').classList.remove('hidden-view');
@@ -548,7 +681,6 @@
             }
         }
 
-        // --- LIFECYCLE & HEADER-MOUNTED AUTHENTICATION ---
         window.addEventListener('DOMContentLoaded', () => {
             const stored = sessionStorage.getItem('kmpUserSession_GRAS');
             if (stored) {
@@ -634,7 +766,6 @@
             else if (document.getElementById('searchInput').value.trim()) searchMemberRecords();
         }
 
-        // --- DIRECTORY SEARCH ---
         function searchMemberRecords() {
             const rawQuery = document.getElementById('searchInput').value.trim();
             if (!rawQuery) return uiAlert("Invalid Input", "Please specify search query parameters.");
@@ -773,7 +904,6 @@
             .catch(() => hideLoader());
         }
 
-        // --- VERIFICATION QUEUE & APPROVAL SYSTEM ---
         function loadKmpPendingApprovals() {
             const tableBody = document.getElementById('kmpApprovalTableBody');
             showLoader("Accessing Verification Queue...");
@@ -935,7 +1065,6 @@
             });
         }
 
-        // --- RBAC MANAGEMENT ---
         function loadStaffUsersList() {
             if (sessionUser.role !== "Admin") return;
             showLoader("Retrieving Operator Records...");
@@ -1067,7 +1196,6 @@
             });
         }
 
-        // --- ENROLLMENT & DEPOSITS ---
         function openAddMemberModal() { document.getElementById('addMemberModal').classList.remove('hidden-view'); }
         function closeAddMemberModal() { document.getElementById('addMemberModal').classList.add('hidden-view'); }
 
@@ -1209,6 +1337,47 @@
                 uiAlert("Network Error", "Communication timeout during deletion.");
             });
         }
+
+        // Custom Cursor & Reveal Animations Observer
+        document.addEventListener('DOMContentLoaded', () => {
+            const dot = document.getElementById('cursorDot');
+            const ring = document.getElementById('cursorRing');
+
+            if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && dot && ring) {
+                let mouseX = 0, mouseY = 0;
+                let ringX = 0, ringY = 0;
+
+                window.addEventListener('mousemove', (e) => {
+                    mouseX = e.clientX;
+                    mouseY = e.clientY;
+                    dot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+                });
+
+                function renderRing() {
+                    ringX += (mouseX - ringX) * 0.18;
+                    ringY += (mouseY - ringY) * 0.18;
+                    ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+                    requestAnimationFrame(renderRing);
+                }
+                requestAnimationFrame(renderRing);
+
+                const interactiveElements = 'a, button, input, select, textarea, [onclick]';
+                document.querySelectorAll(interactiveElements).forEach((el) => {
+                    el.addEventListener('mouseenter', () => ring.classList.add('active-hover'));
+                    el.addEventListener('mouseleave', () => ring.classList.remove('active-hover'));
+                });
+            }
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+        });
     </script>
 </body>
 </html>
