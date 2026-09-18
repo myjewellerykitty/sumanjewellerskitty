@@ -2,605 +2,287 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Suman Jewellers - GRAS 12+1 Operations Portal</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         .hidden-view { display: none !important; }
         .overflow-x-auto { -webkit-overflow-scrolling: touch; }
-
-        @keyframes spinAnimation {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        .active-press {
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
         }
-        .enterprise-spinner {
-            animation: spinAnimation 0.9s linear infinite;
-        }
-
-        @keyframes popupEnter {
-            from { opacity: 0; transform: scale(0.96) translateY(-6px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        .animate-popup {
-            animation: popupEnter 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        /* Interactive Desktop Cursor */
-        @media (hover: hover) and (pointer: fine) {
-            * { cursor: none !important; }
-            .cursor-dot {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 6px;
-                height: 6px;
-                background-color: #b45309;
-                border-radius: 50%;
-                pointer-events: none;
-                z-index: 9999;
-                transform: translate(-50%, -50%);
-                transition: opacity 0.2s ease;
-            }
-            .cursor-ring {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 32px;
-                height: 32px;
-                border: 1.5px solid rgba(180, 83, 9, 0.55);
-                border-radius: 50%;
-                pointer-events: none;
-                z-index: 9998;
-                transform: translate(-50%, -50%);
-                transition: width 0.2s ease, height 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
-            }
-            .cursor-ring.active-hover {
-                width: 48px;
-                height: 48px;
-                border-color: #78350f;
-                background-color: rgba(245, 158, 11, 0.12);
-            }
-        }
-        @media (hover: none) or (pointer: coarse) {
-            .cursor-dot, .cursor-ring { display: none !important; }
-        }
-
-        /* Scroll-Triggered Reveal Animations */
-        .reveal {
-            opacity: 0;
-            transform: translateY(18px);
-            transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
-            will-change: opacity, transform;
-        }
-        .reveal.is-visible {
-            opacity: 1;
-            transform: translateY(0);
+        .active-press:active {
+            transform: scale(0.96);
+            filter: brightness(0.9);
         }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col justify-between">
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen">
 
-    <!-- Interactive Desktop Cursor -->
-    <div id="cursorDot" class="cursor-dot"></div>
-    <div id="cursorRing" class="cursor-ring"></div>
-
-    <!-- Top-Pinned Status / Loading Indicator -->
-    <div id="kmpLoader" class="hidden-view fixed top-3 right-3 sm:right-4 z-50">
-        <div class="bg-slate-900 text-white rounded-xl py-2 px-3.5 sm:px-4 shadow-2xl border border-slate-700 flex items-center gap-2.5 animate-popup">
-            <div class="w-4 h-4 border-2 border-slate-400 border-t-amber-400 rounded-full enterprise-spinner shrink-0"></div>
-            <p id="kmpLoaderMsg" class="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-200">Processing Request...</p>
+    <div id="kmpLoader" class="hidden-view fixed top-3 right-3 z-50">
+        <div class="bg-slate-900 text-white rounded-xl py-2 px-4 shadow-2xl border border-slate-700 flex items-center gap-2.5">
+            <div class="w-4 h-4 border-2 border-slate-400 border-t-amber-400 rounded-full animate-spin shrink-0"></div>
+            <p id="kmpLoaderMsg" class="text-xs font-bold uppercase tracking-wider text-slate-200">Executing...</p>
         </div>
     </div>
 
-    <!-- In-Page Alert Dialog -->
-    <div id="uiAlertDialog" class="hidden-view fixed inset-0 bg-slate-950/40 backdrop-blur-xs flex items-start justify-center pt-8 sm:pt-14 px-3 z-50">
-        <div class="bg-white rounded-xl p-4 sm:p-5 shadow-2xl border border-slate-200 max-w-sm w-full animate-popup">
-            <h3 id="uiAlertTitle" class="text-xs sm:text-sm font-bold text-slate-900 uppercase mb-1">Notification</h3>
-            <p id="uiAlertMessage" class="text-xs text-slate-600 leading-relaxed mb-4">-</p>
-            <button onclick="closeUiAlert()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-lg text-xs uppercase tracking-wider transition-all cursor-pointer">
-                Acknowledge
-            </button>
-        </div>
-    </div>
-
-    <!-- In-Page Confirmation Dialog -->
-    <div id="uiConfirmDialog" class="hidden-view fixed inset-0 bg-slate-950/40 backdrop-blur-xs flex items-start justify-center pt-8 sm:pt-14 px-3 z-50">
-        <div class="bg-white rounded-xl p-4 sm:p-5 shadow-2xl border border-slate-200 max-w-sm w-full animate-popup">
-            <h3 id="uiConfirmTitle" class="text-xs sm:text-sm font-bold text-slate-900 uppercase mb-1">Confirmation Required</h3>
-            <p id="uiConfirmMessage" class="text-xs text-slate-600 leading-relaxed mb-4">-</p>
-            <div class="flex gap-2">
-                <button onclick="handleUiConfirmChoice(false)" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-lg text-xs font-semibold cursor-pointer">
-                    Cancel
-                </button>
-                <button onclick="handleUiConfirmChoice(true)" class="w-1/2 bg-slate-900 hover:bg-slate-800 text-white py-2.5 rounded-lg text-xs font-semibold cursor-pointer">
-                    Proceed
-                </button>
+    <!-- Edit Customer & MPIN Modal (Super Admin Exclusive) -->
+    <div id="editCustomerModal" class="hidden-view fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-start justify-center pt-6 px-3 z-50 overflow-y-auto">
+        <div class="bg-white rounded-2xl p-5 shadow-2xl border border-slate-200 max-w-md w-full">
+            <div class="flex justify-between items-center border-b pb-2 mb-3">
+                <h3 class="text-sm font-black text-slate-900 uppercase">Super Admin: Edit Member &amp; MPIN</h3>
+                <button onclick="closeEditCustomerModal()" class="text-slate-400 hover:text-black font-bold">&times;</button>
             </div>
-        </div>
-    </div>
-
-    <!-- In-Page Input Prompt Dialog -->
-    <div id="uiPromptDialog" class="hidden-view fixed inset-0 bg-slate-950/40 backdrop-blur-xs flex items-start justify-center pt-8 sm:pt-14 px-3 z-50 overflow-y-auto">
-        <div class="bg-white rounded-xl p-4 sm:p-5 shadow-2xl border border-slate-200 max-w-sm w-full animate-popup">
-            <h3 id="uiPromptTitle" class="text-xs sm:text-sm font-bold text-slate-900 uppercase mb-1">Required Input</h3>
-            <p id="uiPromptSubtitle" class="text-xs text-slate-500 mb-3 leading-tight">-</p>
-            <form onsubmit="handleUiPromptSubmit(event)" class="space-y-3">
-                <div id="uiPromptFieldsContainer" class="space-y-2.5 text-xs"></div>
-                <div class="flex gap-2 pt-2">
-                    <button type="button" onclick="closeUiPrompt()" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-lg text-xs font-semibold cursor-pointer">
-                        Cancel
-                    </button>
-                    <button type="submit" class="w-1/2 bg-slate-900 hover:bg-slate-800 text-white py-2.5 rounded-lg text-xs font-semibold cursor-pointer">
-                        Submit
-                    </button>
+            <form onsubmit="submitSuperAdminCustomerEdit(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="font-bold text-slate-600 block mb-1">Full Legal Name</label>
+                    <input type="text" id="editCustName" required class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-bold">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="font-bold text-slate-600 block mb-1">Mobile Number</label>
+                        <input type="tel" id="editCustPhone" required maxlength="10" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-mono font-bold">
+                    </div>
+                    <div>
+                        <label class="font-bold text-amber-800 block mb-1">Override MPIN (4 Digits)</label>
+                        <input type="password" id="editCustMpin" maxlength="4" placeholder="••••" class="w-full px-3 py-2 bg-amber-50 border border-amber-300 rounded-lg font-mono font-bold text-amber-900 text-center">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="font-bold text-slate-600 block mb-1">Monthly Plan (INR)</label>
+                        <input type="number" id="editCustAmount" required min="2000" step="1000" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-mono font-bold">
+                    </div>
+                    <div>
+                        <label class="font-bold text-slate-600 block mb-1">Account Code</label>
+                        <input type="text" id="editCustAc" required class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-mono font-bold">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="font-bold text-slate-600 block mb-1">Token Number</label>
+                        <input type="text" id="editCustToken" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-mono">
+                    </div>
+                    <div>
+                        <label class="font-bold text-slate-600 block mb-1">Join Date (YYYY-MM-DD)</label>
+                        <input type="text" id="editCustDoj" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-mono">
+                    </div>
+                </div>
+                <div>
+                    <label class="font-bold text-slate-600 block mb-1">Email Address</label>
+                    <input type="email" id="editCustEmail" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-mono">
+                </div>
+                <div class="flex gap-2 pt-2 border-t">
+                    <button type="button" onclick="closeEditCustomerModal()" class="w-1/2 bg-slate-100 py-2.5 rounded-xl font-bold active-press">Cancel</button>
+                    <button type="submit" class="w-1/2 bg-amber-800 text-white py-2.5 rounded-xl font-bold uppercase active-press">Save Changes</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Main Navigation Bar -->
-    <div class="min-h-screen flex flex-col flex-1">
-        <header class="bg-slate-900 text-white sticky top-0 z-30 shadow-sm border-b border-slate-800">
-            <div class="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex flex-col lg:flex-row justify-between items-center gap-2.5 sm:gap-3">
-                
-                <!-- Brand Identifier -->
-                <div class="flex items-center gap-2.5 w-full lg:w-auto justify-between lg:justify-start">
-                    <div class="flex items-center gap-2">
-                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-500 flex items-center justify-center font-black text-slate-950 text-xs">SJ</div>
-                        <div>
-                            <h1 class="text-xs font-bold tracking-tight uppercase">Suman Jewellers</h1>
-                            <p class="text-[9px] sm:text-[10px] text-slate-400">GRAS Operations Console</p>
-                        </div>
-                    </div>
-
-                    <!-- Session Status Badge -->
-                    <div id="sessionBadgeContainer" class="hidden-view flex items-center gap-1.5 sm:gap-2">
-                        <span id="kmpRoleBadge" class="text-[9px] sm:text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-800 text-slate-300">Evaluating...</span>
-                        <span class="text-[10px] sm:text-[11px] text-slate-400">User: <strong id="lblActiveUser" class="text-white font-mono">-</strong></span>
-                    </div>
-                </div>
-
-                <!-- Header-Integrated Login Form -->
-                <div id="headerLoginBar" class="w-full lg:w-auto flex items-center justify-end">
-                    <form onsubmit="handleKmpLogin(event)" class="flex items-center gap-1.5 sm:gap-2 w-full lg:w-auto flex-wrap sm:flex-nowrap">
-                        <input type="text" id="kmpUserInput" required placeholder="Username" class="bg-slate-800 border border-slate-700 text-white px-2.5 py-1.5 rounded-lg text-xs focus:ring-1 focus:ring-amber-500 focus:outline-none w-full sm:w-28 md:w-32">
-                        <input type="password" id="kmpPassInput" required placeholder="PIN" class="bg-slate-800 border border-slate-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-mono focus:ring-1 focus:ring-amber-500 focus:outline-none w-full sm:w-20 md:w-24">
-                        <button type="submit" class="bg-amber-700 hover:bg-amber-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap w-full sm:w-auto">
-                            Sign In
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Operations Navigation (Upon Login) -->
-                <div id="headerNavBar" class="hidden-view flex items-center gap-1 sm:gap-1.5 flex-wrap w-full lg:w-auto justify-start sm:justify-end">
-                    <button onclick="switchKmpTab('members')" id="tabBtnMembers" class="bg-slate-800 text-white text-[11px] sm:text-xs font-semibold px-2.5 py-1.5 rounded-lg cursor-pointer transition-all">Directory</button>
-                    <button onclick="switchKmpTab('approvals')" id="tabBtnApprovals" class="bg-slate-800 text-slate-400 text-[11px] sm:text-xs font-semibold px-2.5 py-1.5 rounded-lg cursor-pointer transition-all">Queue</button>
-                    <button onclick="switchKmpTab('users')" id="tabBtnUsers" class="hidden-view bg-slate-800 text-slate-400 text-[11px] sm:text-xs font-semibold px-2.5 py-1.5 rounded-lg cursor-pointer transition-all">Permissions</button>
-                    <button onclick="openAddMemberModal()" id="btnTopAddMember" class="bg-amber-700 hover:bg-amber-800 text-white font-semibold px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs uppercase tracking-wider transition-all cursor-pointer">
-                        + Enroll
-                    </button>
-                    <button onclick="logoutKmp()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] sm:text-xs font-semibold px-2.5 py-1.5 rounded-lg cursor-pointer transition-all">Exit</button>
-                </div>
-
+    <!-- Edit Transaction Row Modal (Super Admin Exclusive) -->
+    <div id="editTxModal" class="hidden-view fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-start justify-center pt-8 px-3 z-50">
+        <div class="bg-white rounded-2xl p-5 shadow-2xl border border-slate-200 max-w-sm w-full">
+            <div class="flex justify-between items-center border-b pb-2 mb-3">
+                <h3 class="text-sm font-black text-slate-900 uppercase">Super Admin: Edit Transaction</h3>
+                <button onclick="closeEditTxModal()" class="text-slate-400 hover:text-black font-bold">&times;</button>
             </div>
-        </header>
-
-        <!-- Unauthenticated Access Restriction -->
-        <div id="loggedOutPlaceholder" class="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 text-center text-slate-500">
-            <div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center mb-3">
-                <span class="text-xl font-mono text-slate-700 font-bold">#</span>
-            </div>
-            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-800">Operational Console Restricted</h2>
-            <p class="text-xs text-slate-500 mt-1 max-w-sm">Please provide authorized operator credentials via the header login bar above to access records and permissions.</p>
-        </div>
-
-        <!-- Main Console Views -->
-        <main id="kmpMainView" class="hidden-view max-w-6xl mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6 flex-1 w-full">
-
-            <!-- Tab 1: Members Directory -->
-            <div id="tabContentMembers" class="space-y-4 sm:space-y-6">
-                <section class="reveal bg-white rounded-xl p-4 sm:p-5 border border-slate-200 shadow-sm">
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600">Database Search</label>
-                        <button onclick="refreshCurrentLedger()" class="text-xs font-bold text-slate-700 hover:text-black transition-all cursor-pointer">
-                            Synchronize Current View
-                        </button>
-                    </div>
-                    <div class="flex flex-col sm:flex-row gap-2">
-                        <input type="text" id="searchInput" placeholder="Search by Mobile, Token No, Name, or Account Code..." class="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium focus:outline-none focus:ring-1 focus:ring-slate-900 focus:bg-white transition-all">
-                        <button onclick="searchMemberRecords()" id="btnSearch" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-lg text-xs font-semibold transition-all cursor-pointer">
-                            Search Records
-                        </button>
-                    </div>
-
-                    <div id="multiKittySelectorWrapper" class="hidden-view mt-3 p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
-                        <p class="text-xs font-bold text-slate-800 uppercase">Multiple Active Accounts Associated</p>
-                        <div id="kittySelectionPills" class="flex flex-wrap gap-2 pt-1"></div>
-                    </div>
-                </section>
-
-                <!-- Active Member Profile Section (No Lucky Draw Elements) -->
-                <section id="memberProfileSection" class="hidden-view space-y-4 sm:space-y-6">
-                    <div class="reveal bg-slate-900 text-white rounded-xl p-4 sm:p-6 shadow-sm border border-slate-800">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 border-b border-slate-800 pb-4 mb-4">
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-900/40 text-amber-300 border border-amber-800/50">12+1 Assured Scheme</span>
-                                    <span id="viewDueRuleBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300">Due: 10th</span>
-                                </div>
-                                <h2 id="viewCustName" class="text-lg sm:text-xl font-bold mt-1 text-white uppercase tracking-tight">-</h2>
-                                <p id="viewCustPhone" class="text-xs font-mono text-slate-400 mt-0.5">-</p>
-                            </div>
-                            <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto">
-                                <button onclick="openManualDepositModal()" id="btnActionDeposit" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition-all cursor-pointer border border-slate-700">
-                                    Counter Deposit
-                                </button>
-                                <button onclick="confirmRemoveMember()" id="btnActionDelete" class="bg-rose-950/40 hover:bg-rose-900 border border-rose-800 text-rose-300 text-xs font-semibold px-3 py-2 rounded-lg transition-all cursor-pointer">
-                                    Delete
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 text-xs">
-                            <div class="bg-slate-800/60 p-2.5 sm:p-3 rounded-lg border border-slate-700/50">
-                                <span class="text-slate-400 uppercase text-[9px] block font-bold">Account Code</span>
-                                <span id="viewKittyNo" class="font-mono font-bold text-xs sm:text-sm text-amber-400">-</span>
-                            </div>
-                            <div class="bg-slate-800/60 p-2.5 sm:p-3 rounded-lg border border-slate-700/50">
-                                <span class="text-slate-400 uppercase text-[9px] block font-bold">Token Number</span>
-                                <span id="viewCustId" class="font-mono font-bold text-xs sm:text-sm text-slate-200">-</span>
-                            </div>
-                            <div class="bg-slate-800/60 p-2.5 sm:p-3 rounded-lg border border-slate-700/50">
-                                <span class="text-slate-400 uppercase text-[9px] block font-bold">Enrollment Date</span>
-                                <span id="viewOtherDetails" class="font-mono font-bold text-xs sm:text-sm text-slate-200">-</span>
-                            </div>
-                            <div class="bg-slate-800/60 p-2.5 sm:p-3 rounded-lg border border-slate-700/50">
-                                <span class="text-slate-400 uppercase text-[9px] block font-bold">Monthly Installment</span>
-                                <span id="viewMonthlyAmount" class="font-bold text-xs sm:text-sm text-slate-200">INR 0</span>
-                            </div>
-                        </div>
-
-                        <div class="mt-3 pt-3 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 text-xs">
-                            <div class="bg-slate-800/40 p-2.5 sm:p-3 rounded-lg border border-slate-700/40">
-                                <span class="text-slate-400 uppercase text-[9px] block font-bold">Total Deposited Principal</span>
-                                <span id="viewTotalBalance" class="font-bold text-xs sm:text-sm text-white font-mono">INR 0</span>
-                            </div>
-                            <div class="bg-emerald-950/40 p-2.5 sm:p-3 rounded-lg border border-emerald-800/40">
-                                <span class="text-[9px] uppercase tracking-wider text-emerald-300 block font-bold">13th Month Jeweller Bonus</span>
-                                <span id="viewJewellerBonus" class="font-mono text-xs sm:text-sm font-bold text-emerald-300">+INR 0</span>
-                            </div>
-                            <div class="bg-slate-800/40 p-2.5 sm:p-3 rounded-lg border border-slate-700/40">
-                                <span class="text-slate-400 uppercase text-[9px] block font-bold">Maturity Jewellery Worth (12+1)</span>
-                                <span id="viewMaturityTotal" class="font-bold text-xs sm:text-sm text-white font-mono">INR 0</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Ledger Table -->
-                    <div class="reveal bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="p-3.5 sm:p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Scheme Ledger Statement (12 Months)</h3>
-                            <span id="viewPaidRatio" class="text-xs font-semibold text-slate-500">0 / 12 Completed</span>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse text-xs">
-                                <thead>
-                                    <tr class="text-slate-500 border-b border-slate-200 bg-white">
-                                        <th class="p-2.5 sm:p-3">Schedule</th>
-                                        <th class="p-2.5 sm:p-3">Status</th>
-                                        <th class="p-2.5 sm:p-3">Remittance</th>
-                                        <th class="p-2.5 sm:p-3">22K Rate</th>
-                                        <th class="p-2.5 sm:p-3">Booked Weight</th>
-                                        <th class="p-2.5 sm:p-3">Reference Identifier</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="memberTxTableBody" class="divide-y divide-slate-100"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-            </div>
-
-            <!-- Tab 2: Pending Approvals Queue -->
-            <div id="tabContentApprovals" class="space-view space-y-3.5 sm:space-y-4 hidden-view">
-                <div class="reveal flex justify-between items-center bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-sm">
-                    <div>
-                        <h2 class="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-tight">Payment Verification Queue</h2>
-                        <p class="text-[11px] text-slate-500">Tier 1: Staff Rate Review &rarr; Tier 2: Final Ledger Audit</p>
-                    </div>
-                    <button onclick="loadKmpPendingApprovals()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg cursor-pointer transition-all">
-                        Refresh Queue
-                    </button>
-                </div>
-
-                <div class="reveal bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead>
-                                <tr class="text-slate-500 bg-slate-50 border-b border-slate-200">
-                                    <th class="p-3">Member Details</th>
-                                    <th class="p-3">Account</th>
-                                    <th class="p-3">Installment</th>
-                                    <th class="p-3">Deposit</th>
-                                    <th class="p-3">Review Status</th>
-                                    <th class="p-3">Reference / Slip</th>
-                                    <th class="p-3 text-center">Authorization Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="kmpApprovalTableBody" class="divide-y divide-slate-100">
-                                <tr><td colspan="7" class="p-6 text-center text-slate-400">Loading pending verification items...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tab 3: Access Control & Permissions -->
-            <div id="tabContentUsers" class="space-view space-y-3.5 sm:space-y-4 hidden-view">
-                <div class="reveal flex justify-between items-center bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-sm">
-                    <div>
-                        <h2 class="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-tight">Access Control &amp; Roles</h2>
-                        <p class="text-[11px] text-slate-500">Manage operator permissions, validation authority, and 2SV</p>
-                    </div>
-                    <button onclick="openUserEditModal()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg cursor-pointer">
-                        Add Operator
-                    </button>
-                </div>
-
-                <div class="reveal bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead>
-                                <tr class="text-slate-500 bg-slate-50 border-b border-slate-200">
-                                    <th class="p-3 uppercase">Operator</th>
-                                    <th class="p-3 uppercase">Role</th>
-                                    <th class="p-3 uppercase">Rate Verification</th>
-                                    <th class="p-3 uppercase">Final Posting</th>
-                                    <th class="p-3 uppercase">2SV Requirement</th>
-                                    <th class="p-3 uppercase">Status</th>
-                                    <th class="p-3 uppercase text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="userTableBody" class="divide-y divide-slate-100"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <!-- Modal: Add / Edit Staff Permissions -->
-    <div id="userModal" class="hidden-view fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-start justify-center p-3 pt-4 sm:pt-8 z-50 overflow-y-auto">
-        <div class="bg-white rounded-xl p-4 sm:p-6 w-full max-w-md shadow-2xl border border-slate-200 max-h-[85vh] overflow-y-auto animate-popup">
-            <h3 id="userModalTitle" class="text-xs sm:text-sm font-bold text-slate-900 mb-3.5 uppercase">Configure Operator Privileges</h3>
-            <form onsubmit="saveStaffUser(event)" class="space-y-3 text-xs">
+            <form onsubmit="submitSuperAdminTxEdit(event)" class="space-y-3 text-xs">
+                <input type="hidden" id="editTxRow">
                 <div>
-                    <label class="font-semibold text-slate-700 block mb-1">Operator Username</label>
-                    <input type="text" id="usrNameInput" required class="w-full px-3 py-2 border rounded-lg font-semibold">
+                    <label class="font-bold text-slate-600 block mb-1">Remittance Amount (INR)</label>
+                    <input type="number" id="editTxAmount" required class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-mono font-bold">
                 </div>
                 <div>
-                    <label class="font-semibold text-slate-700 block mb-1">Security PIN</label>
-                    <input type="password" id="usrPinInput" required maxlength="6" class="w-full px-3 py-2 border rounded-lg font-mono">
-                </div>
-                <div>
-                    <label class="font-semibold text-slate-700 block mb-1">Role Type</label>
-                    <select id="usrRoleInput" class="w-full px-3 py-2 border rounded-lg font-semibold">
-                        <option value="Staff">Staff</option>
-                        <option value="Admin">Admin</option>
+                    <label class="font-bold text-slate-600 block mb-1">Status</label>
+                    <select id="editTxStatus" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-bold">
+                        <option value="Paid">Paid</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Reviewed">Reviewed</option>
                     </select>
                 </div>
-                <div class="space-y-2 pt-2 border-t">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" id="usrCanApprove" class="rounded">
-                        <span class="font-medium text-slate-800">Authorized to review payments and enter daily gold rates</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" id="usrCanFinalApprove" class="rounded">
-                        <span class="font-medium text-slate-800">Authorized for direct posting and final ledger commitment</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" id="usrBypass2SV" class="rounded">
-                        <span class="font-medium text-slate-800">Bypass secondary PIN verification prompt</span>
-                    </label>
+                <div>
+                    <label class="font-bold text-slate-600 block mb-1">22K Gold Rate Applied</label>
+                    <input type="number" id="editTxRate" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-mono font-bold">
                 </div>
-                <div class="flex gap-2 pt-2">
-                    <button type="button" onclick="closeUserModal()" class="w-1/2 bg-slate-100 py-2.5 rounded-lg font-semibold cursor-pointer">Cancel</button>
-                    <button type="submit" class="w-1/2 bg-slate-900 text-white py-2.5 rounded-lg font-semibold cursor-pointer">Save Credentials</button>
+                <div>
+                    <label class="font-bold text-slate-600 block mb-1">Booked Weight (Grams)</label>
+                    <input type="number" step="0.001" id="editTxGrams" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-mono font-bold">
+                </div>
+                <div>
+                    <label class="font-bold text-slate-600 block mb-1">Transaction UTR Reference</label>
+                    <input type="text" id="editTxUtr" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-mono">
+                </div>
+                <div class="flex gap-2 pt-2 border-t">
+                    <button type="button" onclick="closeEditTxModal()" class="w-1/2 bg-slate-100 py-2.5 rounded-xl font-bold active-press">Cancel</button>
+                    <button type="submit" class="w-1/2 bg-slate-900 text-white py-2.5 rounded-xl font-bold uppercase active-press">Commit Update</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal: Enroll New Member -->
-    <div id="addMemberModal" class="hidden-view fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-start justify-center p-3 pt-4 sm:pt-8 z-50 overflow-y-auto">
-        <div class="bg-white rounded-xl p-4 sm:p-6 w-full max-w-md shadow-2xl border border-slate-200 max-h-[85vh] overflow-y-auto animate-popup">
-            <div class="border-b border-slate-200 pb-2.5 mb-3 flex justify-between items-center">
-                <h3 class="text-xs sm:text-sm font-bold text-slate-900 uppercase">Enroll GRAS Participant</h3>
-                <button onclick="closeAddMemberModal()" class="text-slate-400 hover:text-slate-700 font-bold text-base cursor-pointer p-1">&times;</button>
-            </div>
+    <!-- Header Navigation -->
+    <header class="bg-slate-900 text-white sticky top-0 z-30 shadow-md border-b border-slate-800">
+        <div class="max-w-6xl mx-auto px-4 py-2.5 flex flex-col md:flex-row justify-between items-center gap-3">
             
-            <form onsubmit="submitNewMember(event)" class="space-y-3 text-xs">
-                <div>
-                    <label class="font-semibold text-slate-700 block mb-1">Mobile Number (10 Digits) *</label>
-                    <input type="tel" id="newPhone" maxlength="10" required class="w-full px-3 py-2 border border-slate-200 rounded-lg font-mono">
-                </div>
-                <div>
-                    <label class="font-semibold text-slate-700 block mb-1">Full Legal Name *</label>
-                    <input type="text" id="newName" required class="w-full px-3 py-2 border border-slate-200 rounded-lg">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="font-semibold text-slate-700 block mb-1">Monthly Plan (INR) *</label>
-                        <input type="number" id="newAmount" required min="2000" step="1000" value="5000" class="w-full px-3 py-2 border border-slate-200 rounded-lg font-bold">
+            <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-full bg-[#800020] border-2 border-amber-400/40 p-1 flex items-center justify-center shrink-0 shadow-sm">
+                        <img src="https://i.pinimg.com/736x/64/54/15/645415db220d053544ae62e6bea65d45.jpg" alt="Logo" class="w-full h-full object-contain">
                     </div>
                     <div>
-                        <label class="font-semibold text-slate-700 block mb-1">Token Number</label>
-                        <input type="text" id="newCustId" class="w-full px-3 py-2 border border-slate-200 rounded-lg font-mono">
+                        <h1 class="text-xs font-black uppercase tracking-wider text-white">Suman Jewellers</h1>
+                        <p class="text-[10px] text-amber-400 font-semibold tracking-wide">GRAS 12+1 Assured Operations Console</p>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="font-semibold text-slate-700 block mb-1">Account Code *</label>
-                        <input type="text" id="newKittyNo" required class="w-full px-3 py-2 border border-slate-200 rounded-lg font-mono font-bold">
-                    </div>
-                    <div>
-                        <label class="font-semibold text-slate-700 block mb-1">Enrollment Date</label>
-                        <input type="date" id="newRemarks" class="w-full px-3 py-2 border border-slate-200 rounded-lg font-mono">
-                    </div>
+
+                <div id="sessionBadgeContainer" class="hidden-view flex items-center gap-2">
+                    <span id="kmpRoleBadge" class="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded bg-slate-800 text-slate-300">Staff</span>
+                    <span class="text-xs text-slate-400">User: <strong id="lblActiveUser" class="text-white font-mono">-</strong></span>
                 </div>
-                <div>
-                    <label class="font-semibold text-slate-700 block mb-1">Email Address</label>
-                    <input type="email" id="newEmail" class="w-full px-3 py-2 border border-slate-200 rounded-lg">
-                </div>
-                
-                <div class="pt-2 flex gap-2">
-                    <button type="button" onclick="closeAddMemberModal()" class="w-1/2 bg-slate-100 py-2.5 rounded-lg font-semibold cursor-pointer">Cancel</button>
-                    <button type="submit" id="btnSubmitMember" class="w-1/2 bg-slate-900 text-white py-2.5 rounded-lg font-semibold hover:bg-slate-800 cursor-pointer">Commit Registration</button>
-                </div>
-            </form>
+            </div>
+
+            <div id="headerLoginBar" class="w-full md:w-auto flex items-center justify-end">
+                <form onsubmit="handleKmpLogin(event)" class="flex items-center gap-2 w-full md:w-auto">
+                    <input type="text" id="kmpUserInput" required placeholder="Username" class="bg-slate-800 border border-slate-700 text-white px-3 py-1.5 rounded-xl text-xs w-28 md:w-32 focus:outline-none">
+                    <input type="password" id="kmpPassInput" required placeholder="PIN" class="bg-slate-800 border border-slate-700 text-white px-3 py-1.5 rounded-xl text-xs font-mono w-20 md:w-24 focus:outline-none">
+                    <button type="submit" class="bg-[#800020] hover:bg-[#600018] text-white font-bold px-4 py-1.5 rounded-xl text-xs uppercase cursor-pointer active-press">Sign In</button>
+                </form>
+            </div>
+
+            <div id="headerNavBar" class="hidden-view flex items-center gap-2 flex-wrap w-full md:w-auto justify-start md:justify-end">
+                <!-- GRMS ADMIN Button -->
+                <a href="https://www.sumanjewellers.co.in/about/golden-rose-magic-scheme/admin" target="_blank" class="bg-amber-700 hover:bg-amber-600 border border-amber-500 text-white text-xs font-black px-3 py-1.5 rounded-xl cursor-pointer active-press flex items-center gap-1">
+                    <span>GRMS ADMIN</span>
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                </a>
+                <button onclick="switchKmpTab('members')" id="tabBtnMembers" class="bg-slate-800 text-white text-xs font-semibold px-3 py-1.5 rounded-xl cursor-pointer active-press">Directory</button>
+                <button onclick="switchKmpTab('approvals')" id="tabBtnApprovals" class="bg-slate-800 text-slate-400 text-xs font-semibold px-3 py-1.5 rounded-xl cursor-pointer active-press">Queue</button>
+                <button onclick="logoutKmp()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold px-3 py-1.5 rounded-xl cursor-pointer active-press">Exit</button>
+            </div>
+
         </div>
+    </header>
+
+    <div id="loggedOutPlaceholder" class="flex flex-col items-center justify-center p-12 text-center text-slate-500">
+        <div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center mb-3 text-slate-700 font-black">SJ</div>
+        <h2 class="text-sm font-bold uppercase text-slate-800">Operational Console Restricted</h2>
+        <p class="text-xs text-slate-500 mt-1 max-w-sm">Please sign in with operator credentials to view and manage GRAS records.</p>
     </div>
 
-    <!-- Modal: Counter Deposit -->
-    <div id="manualDepositModal" class="hidden-view fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-start justify-center p-3 pt-4 sm:pt-8 z-50 overflow-y-auto">
-        <div class="bg-white rounded-xl p-4 sm:p-6 w-full max-w-md shadow-2xl border border-slate-200 max-h-[85vh] overflow-y-auto animate-popup">
-            <div class="border-b border-slate-200 pb-2.5 mb-3 flex justify-between items-center">
-                <div>
-                    <h3 class="text-xs sm:text-sm font-bold text-slate-900 uppercase">Post Counter Payment</h3>
-                    <p id="depositTargetLabel" class="text-xs text-slate-500 font-mono mt-0.5">-</p>
+    <!-- Main Views -->
+    <main id="kmpMainView" class="hidden-view max-w-6xl mx-auto p-4 sm:p-6 space-y-5">
+        <div id="tabContentMembers" class="space-y-4">
+            <section class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-xs font-bold uppercase text-slate-600">Member Search</label>
                 </div>
-                <button onclick="closeManualDepositModal()" class="text-slate-400 hover:text-slate-700 font-bold text-base cursor-pointer p-1">&times;</button>
-            </div>
-            
-            <form onsubmit="submitManualDeposit(event)" class="space-y-3 text-xs">
-                <div>
-                    <label class="font-semibold text-slate-700 block mb-1">Installment Schedule *</label>
-                    <select id="depositMonth" required class="w-full px-3 py-2 border border-slate-200 rounded-lg font-semibold"></select>
+                <div class="flex gap-2">
+                    <input type="text" id="searchInput" placeholder="Search by Mobile, Token, Name, or Account Code..." class="flex-1 px-3.5 py-2.5 bg-slate-50 border rounded-xl text-xs font-medium font-mono focus:outline-none">
+                    <button onclick="searchMemberRecords()" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase cursor-pointer active-press">Search</button>
                 </div>
-                <div>
-                    <label class="font-semibold text-slate-700 block mb-1">Remittance Amount (INR) *</label>
-                    <input type="number" id="depositAmount" required oninput="calculateRealtimeGold()" class="w-full px-3 py-2 border border-slate-200 rounded-lg font-mono font-bold">
+                <div id="multiKittySelectorWrapper" class="hidden-view mt-3 p-3 bg-slate-50 border rounded-xl space-y-2">
+                    <p class="text-xs font-bold text-slate-800 uppercase">Multiple Active Accounts</p>
+                    <div id="kittySelectionPills" class="flex flex-wrap gap-2 pt-1"></div>
                 </div>
-                <div>
-                    <label class="font-semibold text-slate-700 block mb-1">22K Gold Rate for 10 Grams (INR) *</label>
-                    <input type="number" id="depositRate" required oninput="calculateRealtimeGold()" placeholder="Mandatory Daily Rate" class="w-full px-3 py-2 border border-slate-200 rounded-lg font-mono font-bold">
-                </div>
+            </section>
 
-                <div class="p-2.5 sm:p-3 bg-slate-50 border border-slate-200 rounded-lg flex justify-between items-center">
-                    <div>
-                        <span class="text-[10px] uppercase font-bold text-slate-500 block">Calculated 22K Weight</span>
-                        <span class="text-[11px] text-slate-700">Formula: Amount / (Rate per Gram)</span>
+            <section id="memberProfileSection" class="hidden-view space-y-4">
+                <div class="bg-slate-900 text-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-800">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-4 mb-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] bg-amber-500/20 text-amber-300 font-bold px-2 py-0.5 rounded uppercase">12+1 Assured Active</span>
+                                <span id="viewDueRuleBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300">-</span>
+                            </div>
+                            <h2 id="viewCustName" class="text-lg sm:text-xl font-bold mt-1 uppercase">-</h2>
+                            <p id="viewCustPhone" class="text-xs font-mono text-slate-400 mt-0.5">-</p>
+                        </div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <button id="btnSuperAdminEditCust" onclick="openSuperAdminCustomerModal()" class="hidden-view bg-amber-700 hover:bg-amber-600 text-white font-bold text-xs px-3 py-2 rounded-xl cursor-pointer active-press">
+                                Edit Profile &amp; MPIN
+                            </button>
+                            <button onclick="confirmRemoveMember()" class="bg-rose-950/60 border border-rose-800 text-rose-300 text-xs font-semibold px-3 py-2 rounded-xl cursor-pointer active-press">Delete</button>
+                        </div>
                     </div>
-                    <span id="lblLiveAllocatedWeight" class="text-sm sm:text-base font-bold font-mono text-slate-900">0.000 g</span>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+                        <div class="bg-slate-800/60 p-3 rounded-xl"><span class="text-slate-400 text-[9px] block uppercase font-bold">Account Code</span><span id="viewKittyNo" class="font-mono font-bold text-amber-400">-</span></div>
+                        <div class="bg-slate-800/60 p-3 rounded-xl"><span class="text-slate-400 text-[9px] block uppercase font-bold">Token No</span><span id="viewCustId" class="font-mono font-bold text-slate-200">-</span></div>
+                        <div class="bg-slate-800/60 p-3 rounded-xl"><span class="text-slate-400 text-[9px] block uppercase font-bold">Join Date</span><span id="viewOtherDetails" class="font-mono font-bold text-slate-200">-</span></div>
+                        <div class="bg-slate-800/60 p-3 rounded-xl"><span class="text-slate-400 text-[9px] block uppercase font-bold">Monthly Plan</span><span id="viewMonthlyAmount" class="font-bold text-slate-200">-</span></div>
+                    </div>
+
+                    <div class="mt-3 pt-3 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                        <div class="bg-slate-800/40 p-3 rounded-xl"><span class="text-slate-400 text-[9px] block uppercase font-bold">Principal Deposited</span><span id="viewTotalBalance" class="font-mono font-bold text-white text-sm">₹0</span></div>
+                        <div class="bg-emerald-950/40 p-3 rounded-xl border border-emerald-800/40"><span class="text-emerald-300 text-[9px] block uppercase font-bold">13th Month Bonus</span><span id="viewBonusVal" class="font-mono font-bold text-emerald-300 text-sm">+₹0</span></div>
+                        <div class="bg-slate-800/40 p-3 rounded-xl"><span class="text-slate-400 text-[9px] block uppercase font-bold">Jewellery Worth</span><span id="viewMaturityTotal" class="font-mono font-bold text-white text-sm">₹0</span></div>
+                    </div>
                 </div>
 
-                <div>
-                    <label class="font-semibold text-slate-700 block mb-1">Payment Reference Key</label>
-                    <input type="text" id="depositRef" placeholder="Counter Cash Deposit" class="w-full px-3 py-2 border border-slate-200 rounded-lg">
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-4 border-b flex justify-between items-center bg-slate-50">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Scheme Ledger (12 Months)</h3>
+                        <span id="viewPaidRatio" class="text-xs font-semibold text-slate-500">0 / 12 Complete</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="text-slate-500 bg-white border-b">
+                                    <th class="p-3">Schedule</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3">Remittance</th>
+                                    <th class="p-3">22K Rate</th>
+                                    <th class="p-3">Weight</th>
+                                    <th class="p-3">Reference / UTR</th>
+                                    <th class="p-3 text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="memberTxTableBody" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
                 </div>
-                
-                <div class="pt-2 flex gap-2">
-                    <button type="button" onclick="closeManualDepositModal()" class="w-1/2 bg-slate-100 py-2.5 rounded-lg font-semibold cursor-pointer">Cancel</button>
-                    <button type="submit" id="btnSubmitDeposit" class="w-1/2 bg-slate-900 text-white py-2.5 rounded-lg font-semibold hover:bg-slate-800 cursor-pointer">Commit Transaction</button>
-                </div>
-            </form>
+            </section>
         </div>
-    </div>
 
-    <!-- Standardized Luxury Multi-Column Footer -->
-    <footer class="reveal bg-slate-900 text-slate-300 border-t border-slate-800 mt-10 pt-10 pb-8 text-xs">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-                
-                <!-- Col 1: Brand Info -->
-                <div class="space-y-3">
-                    <div class="flex items-center gap-2">
-                        <div class="w-6 h-6 rounded bg-amber-500 flex items-center justify-center font-black text-slate-950 text-[10px]">SJ</div>
-                        <span class="font-bold tracking-tight uppercase text-white">Suman Jewellers</span>
-                    </div>
-                    <p class="text-[11px] text-slate-400 leading-relaxed">
-                        Pure 22K Gold &amp; Certified Diamond jewellery crafted with heritage, trust, and transparent monthly kitty schemes since 1996.
-                    </p>
-                    <div class="pt-1">
-                        <a href="https://maps.app.goo.gl/iAv32xCsxuh1K7pa8" target="_blank" class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-amber-400 hover:text-amber-300 transition-colors">
-                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                            <span>Visit Our Showroom</span>
-                        </a>
-                    </div>
+        <div id="tabContentApprovals" class="space-y-4 hidden-view">
+            <div class="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                <div>
+                    <h2 class="text-sm font-bold uppercase text-slate-900">Payment Verification Queue</h2>
                 </div>
-
-                <!-- Col 2: Showroom Directory -->
-                <div class="space-y-2.5">
-                    <h5 class="text-[11px] font-bold text-white uppercase tracking-wider">Explore</h5>
-                    <ul class="space-y-2 text-[11px]">
-                        <li><a href="https://www.sumanjewellers.co.in/collection" target="_blank" class="hover:text-amber-400 transition-colors">Jewellery Collection</a></li>
-                        <li><a href="https://maps.app.goo.gl/iAv32xCsxuh1K7pa8" target="_blank" class="hover:text-amber-400 transition-colors">Locate Store</a></li>
-                        <li><a href="https://www.sumanjewellers.co.in/about/blogs" target="_blank" class="hover:text-amber-400 transition-colors">Articles &amp; Blogs</a></li>
-                        <li><a href="https://www.sumanjewellers.co.in/about/contact-us" target="_blank" class="hover:text-amber-400 transition-colors">Contact Support</a></li>
-                    </ul>
-                </div>
-
-                <!-- Col 3: Scheme Portals -->
-                <div class="space-y-2.5">
-                    <h5 class="text-[11px] font-bold text-white uppercase tracking-wider">Kitty Portals</h5>
-                    <ul class="space-y-2 text-[11px]">
-                        <li><a href="https://www.sumanjewellers.co.in/about/golden-rose-assured" target="_blank" class="hover:text-amber-400 transition-colors">12+1 Assured Kitty (GRAS)</a></li>
-                        <li><a href="https://www.sumanjewellers.co.in/about/golden-rose-magic-scheme" target="_blank" class="hover:text-amber-400 transition-colors">11M Lucky Draw (GRMS)</a></li>
-                        <li><a href="https://www.sumanjewellers.co.in/about/contact-us" target="_blank" class="hover:text-amber-400 transition-colors">Help Desk &amp; Inquiry</a></li>
-                    </ul>
-                </div>
-
-                <!-- Col 4: Connect & Socials -->
-                <div class="space-y-3">
-                    <h5 class="text-[11px] font-bold text-white uppercase tracking-wider">Connect With Us</h5>
-                    <p class="text-[11px] text-slate-400">Direct Showroom Assistance:</p>
-                    <a href="https://wa.me/917840000934" target="_blank" class="inline-flex items-center gap-2 bg-emerald-700/80 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all">
-                        <svg class="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.043.072.043.419-.101.824z"/></svg>
-                        <span>WhatsApp Chat</span>
-                    </a>
-                    <div class="flex items-center gap-3 pt-1">
-                        <!-- Instagram -->
-                        <a href="https://www.instagram.com/sumanjewellers1996/" target="_blank" aria-label="Instagram" class="w-7 h-7 rounded-full bg-slate-800 hover:bg-amber-600 flex items-center justify-center text-slate-300 hover:text-white transition-all">
-                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                        </a>
-                        <!-- Facebook -->
-                        <a href="https://facebook.com" target="_blank" aria-label="Facebook" class="w-7 h-7 rounded-full bg-slate-800 hover:bg-amber-600 flex items-center justify-center text-slate-300 hover:text-white transition-all">
-                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg>
-                        </a>
-                        <!-- YouTube -->
-                        <a href="https://youtube.com" target="_blank" aria-label="YouTube" class="w-7 h-7 rounded-full bg-slate-800 hover:bg-amber-600 flex items-center justify-center text-slate-300 hover:text-white transition-all">
-                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-                        </a>
-                    </div>
-                </div>
+                <button onclick="loadKmpPendingApprovals()" class="bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-xl cursor-pointer active-press">Refresh</button>
             </div>
-
-            <!-- Bottom Copyright -->
-            <div class="border-t border-slate-800 pt-5 flex flex-col sm:flex-row justify-between items-center gap-2 text-[10px] text-slate-500">
-                <p>&copy; 2026 Suman Jewellers. All rights reserved.</p>
-                <p class="tracking-wider uppercase font-semibold">An Ofbuzz Product &bull; Ofbuzz Technology</p>
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="text-slate-500 bg-slate-50 border-b">
+                                <th class="p-3">Member</th>
+                                <th class="p-3">Account</th>
+                                <th class="p-3">Month</th>
+                                <th class="p-3">Deposit</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3">Reference</th>
+                                <th class="p-3 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="kmpApprovalTableBody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </footer>
+    </main>
 
-    <!-- Global App Engine Scripts -->
     <script>
         const config = {
             scriptUrl: "https://script.google.com/macros/s/AKfycbx0KKUYsLjlckxTzfVgpsVmIhyAWLBupuPHuk1xdd4CvHpAuQVRxRYRqwBu6irgey2r/exec",
-            schemeMonths: 12,
-            upiVpa: "vyapar.178552646415@hdfcbank",
-            brandName: "Suman Jewellers"
+            schemeMonths: 12
         };
 
         let sessionUser = null;
-        let activeSearchResults = [];
         let selectedMemberData = null;
 
-        let activeConfirmResolver = null;
-        let activePromptResolver = null;
-
-        function showLoader(msg = "Communicating with Database...") {
+        function showLoader(msg = "Communicating...") {
             document.getElementById('kmpLoaderMsg').innerText = msg;
             document.getElementById('kmpLoader').classList.remove('hidden-view');
         }
@@ -609,80 +291,8 @@
             document.getElementById('kmpLoader').classList.add('hidden-view');
         }
 
-        function uiAlert(title, message) {
-            document.getElementById('uiAlertTitle').innerText = title || "Notice";
-            document.getElementById('uiAlertMessage').innerText = message || "";
-            document.getElementById('uiAlertDialog').classList.remove('hidden-view');
-        }
-
-        function closeUiAlert() {
-            document.getElementById('uiAlertDialog').classList.add('hidden-view');
-        }
-
-        function uiConfirm(title, message) {
-            return new Promise((resolve) => {
-                activeConfirmResolver = resolve;
-                document.getElementById('uiConfirmTitle').innerText = title || "Confirmation";
-                document.getElementById('uiConfirmMessage').innerText = message || "";
-                document.getElementById('uiConfirmDialog').classList.remove('hidden-view');
-            });
-        }
-
-        function handleUiConfirmChoice(result) {
-            document.getElementById('uiConfirmDialog').classList.add('hidden-view');
-            if (activeConfirmResolver) {
-                activeConfirmResolver(result);
-                activeConfirmResolver = null;
-            }
-        }
-
-        function uiPrompt(title, subtitle, fields = []) {
-            return new Promise((resolve) => {
-                activePromptResolver = resolve;
-                document.getElementById('uiPromptTitle').innerText = title || "Required Input";
-                document.getElementById('uiPromptSubtitle').innerText = subtitle || "";
-                const container = document.getElementById('uiPromptFieldsContainer');
-                container.innerHTML = "";
-
-                fields.forEach(f => {
-                    container.innerHTML += `
-                        <div>
-                            <label class="font-semibold text-slate-700 block mb-1">${f.label}</label>
-                            <input type="${f.type || 'text'}" id="${f.id}" ${f.required ? 'required' : ''} placeholder="${f.placeholder || ''}" class="w-full px-3 py-2 border rounded-lg font-${f.mono ? 'mono' : 'sans'}">
-                        </div>
-                    `;
-                });
-
-                document.getElementById('uiPromptDialog').classList.remove('hidden-view');
-                if (fields.length > 0 && document.getElementById(fields[0].id)) {
-                    document.getElementById(fields[0].id).focus();
-                }
-            });
-        }
-
-        function handleUiPromptSubmit(e) {
-            e.preventDefault();
-            const inputs = document.getElementById('uiPromptFieldsContainer').querySelectorAll('input');
-            const data = {};
-            inputs.forEach(inp => data[inp.id] = inp.value.trim());
-            document.getElementById('uiPromptDialog').classList.add('hidden-view');
-
-            if (activePromptResolver) {
-                activePromptResolver(data);
-                activePromptResolver = null;
-            }
-        }
-
-        function closeUiPrompt() {
-            document.getElementById('uiPromptDialog').classList.add('hidden-view');
-            if (activePromptResolver) {
-                activePromptResolver(null);
-                activePromptResolver = null;
-            }
-        }
-
         window.addEventListener('DOMContentLoaded', () => {
-            const stored = sessionStorage.getItem('kmpUserSession_GRAS');
+            const stored = sessionStorage.getItem('kmpSession_GRAS');
             if (stored) {
                 sessionUser = JSON.parse(stored);
                 renderUserUI();
@@ -693,33 +303,26 @@
             e.preventDefault();
             const username = document.getElementById('kmpUserInput').value.trim();
             const pin = document.getElementById('kmpPassInput').value.trim();
+            showLoader("Authenticating...");
 
-            showLoader("Validating Credentials...");
-
-            fetch(`${config.scriptUrl}?action=staffLogin&username=${encodeURIComponent(username)}&pin=${encodeURIComponent(pin)}&_ts=${Date.now()}`, {
-                method: "GET",
-                mode: "cors"
-            })
+            fetch(`${config.scriptUrl}?action=staffLogin&username=${encodeURIComponent(username)}&pin=${encodeURIComponent(pin)}&_ts=${Date.now()}`)
             .then(r => r.json())
             .then(res => {
                 hideLoader();
                 if (res.success && res.user) {
                     sessionUser = res.user;
                     sessionUser.pin = pin;
-                    sessionStorage.setItem('kmpUserSession_GRAS', JSON.stringify(sessionUser));
+                    sessionStorage.setItem('kmpSession_GRAS', JSON.stringify(sessionUser));
                     renderUserUI();
                 } else {
-                    uiAlert("Authentication Failed", res.error || "Invalid operator credentials.");
+                    alert(res.error || "Invalid credentials.");
                 }
             })
-            .catch(() => {
-                hideLoader();
-                uiAlert("Network Error", "Server connection timeout during authentication.");
-            });
+            .catch(() => { hideLoader(); alert("Connection timeout."); });
         }
 
         function logoutKmp() {
-            sessionStorage.removeItem('kmpUserSession_GRAS');
+            sessionStorage.removeItem('kmpSession_GRAS');
             window.location.reload();
         }
 
@@ -735,166 +338,115 @@
             badge.innerText = sessionUser.role;
 
             if (sessionUser.role === "Admin") {
-                badge.className = "text-[9px] sm:text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-amber-800 text-white";
-                document.getElementById('tabBtnUsers').classList.remove('hidden-view');
-                document.getElementById('btnTopAddMember').classList.remove('hidden-view');
-            } else {
-                badge.className = "text-[9px] sm:text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-800 text-slate-300";
-                document.getElementById('tabBtnUsers').classList.add('hidden-view');
+                badge.className = "text-[10px] font-bold uppercase px-2.5 py-0.5 rounded bg-amber-500 text-slate-950";
             }
         }
 
         function switchKmpTab(tab) {
-            ['Members', 'Approvals', 'Users'].forEach(t => {
-                const el = document.getElementById('tabContent' + t);
-                const btn = document.getElementById('tabBtn' + t);
+            ['members', 'approvals'].forEach(t => {
+                const el = document.getElementById('tabContent' + t.charAt(0).toUpperCase() + t.slice(1));
+                const btn = document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1));
                 if (el) el.classList.add('hidden-view');
-                if (btn) btn.className = "bg-slate-800 text-slate-400 text-[11px] sm:text-xs font-semibold px-2.5 py-1.5 rounded-lg cursor-pointer transition-all";
+                if (btn) btn.className = "bg-slate-800 text-slate-400 text-xs font-semibold px-3 py-1.5 rounded-xl cursor-pointer active-press";
             });
 
             const activeContent = document.getElementById('tabContent' + tab.charAt(0).toUpperCase() + tab.slice(1));
             const activeBtn = document.getElementById('tabBtn' + tab.charAt(0).toUpperCase() + tab.slice(1));
             if (activeContent) activeContent.classList.remove('hidden-view');
-            if (activeBtn) activeBtn.className = "bg-slate-800 text-white text-[11px] sm:text-xs font-semibold px-2.5 py-1.5 rounded-lg cursor-pointer transition-all";
+            if (activeBtn) activeBtn.className = "bg-slate-800 text-white text-xs font-semibold px-3 py-1.5 rounded-xl cursor-pointer active-press";
 
             if (tab === 'approvals') loadKmpPendingApprovals();
-            if (tab === 'users') loadStaffUsersList();
-        }
-
-        function refreshCurrentLedger() {
-            if (selectedMemberData) loadMemberLedger(selectedMemberData);
-            else if (document.getElementById('searchInput').value.trim()) searchMemberRecords();
         }
 
         function searchMemberRecords() {
-            const rawQuery = document.getElementById('searchInput').value.trim();
-            if (!rawQuery) return uiAlert("Invalid Input", "Please specify search query parameters.");
+            const raw = document.getElementById('searchInput').value.trim();
+            if (!raw) return alert("Enter search query.");
+            showLoader("Searching...");
 
-            showLoader("Searching Database...");
-
-            fetch(`${config.scriptUrl}?action=searchMembers&query=${encodeURIComponent(rawQuery)}&_ts=${Date.now()}`, {
-                method: "GET",
-                mode: "cors"
-            })
+            fetch(`${config.scriptUrl}?action=searchMembers&query=${encodeURIComponent(raw)}&_ts=${Date.now()}`)
             .then(r => r.json())
             .then(res => {
                 hideLoader();
-                if (!res || !res.results || res.results.length === 0) {
-                    document.getElementById('multiKittySelectorWrapper').classList.add('hidden-view');
-                    document.getElementById('memberProfileSection').classList.add('hidden-view');
-                    return uiAlert("Search Result", "No account records match the specified query.");
-                }
-
-                activeSearchResults = res.results;
-                if (activeSearchResults.length > 1) {
-                    renderMultipleKittySelection();
+                if (!res || !res.results || res.results.length === 0) return alert("No accounts found.");
+                if (res.results.length === 1) {
+                    loadMemberLedger(res.results[0]);
                 } else {
-                    document.getElementById('multiKittySelectorWrapper').classList.add('hidden-view');
-                    loadMemberLedger(activeSearchResults[0]);
+                    const pills = document.getElementById('kittySelectionPills');
+                    pills.innerHTML = "";
+                    res.results.forEach(m => {
+                        pills.innerHTML += `<button onclick='loadMemberLedger(${JSON.stringify(m)})' class="bg-white border text-slate-800 font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer active-press">A/C: ${m.acCode} (${m.name})</button>`;
+                    });
+                    document.getElementById('multiKittySelectorWrapper').classList.remove('hidden-view');
                 }
             })
-            .catch(() => {
-                hideLoader();
-                uiAlert("Database Error", "Unable to communicate with search cluster.");
-            });
-        }
-
-        function renderMultipleKittySelection() {
-            const wrapper = document.getElementById('multiKittySelectorWrapper');
-            const pillsContainer = document.getElementById('kittySelectionPills');
-            pillsContainer.innerHTML = "";
-
-            activeSearchResults.forEach((res, index) => {
-                pillsContainer.innerHTML += `
-                    <button onclick="selectSpecificKitty(${index})" class="bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 font-semibold px-3 py-1.5 rounded text-xs transition-all cursor-pointer">
-                        Account: ${res.acCode || res.kittyNumber} (${res.name})
-                    </button>
-                `;
-            });
-            wrapper.classList.remove('hidden-view');
-            document.getElementById('memberProfileSection').classList.add('hidden-view');
-        }
-
-        function selectSpecificKitty(index) {
-            document.getElementById('multiKittySelectorWrapper').classList.add('hidden-view');
-            loadMemberLedger(activeSearchResults[index]);
+            .catch(() => hideLoader());
         }
 
         function loadMemberLedger(member) {
+            document.getElementById('multiKittySelectorWrapper').classList.add('hidden-view');
             selectedMemberData = member;
-            showLoader("Loading Statement Records...");
+            showLoader("Loading Ledger...");
 
             document.getElementById('viewCustName').innerText = member.name;
             document.getElementById('viewCustPhone').innerText = "+91 " + member.phone;
-            document.getElementById('viewCustId').innerText = member.tokenNo || member.customerId || "-";
-            document.getElementById('viewKittyNo').innerText = member.acCode || member.kittyNumber;
-            document.getElementById('viewMonthlyAmount').innerText = "INR " + Number(member.monthlyAmount).toLocaleString('en-IN');
-            document.getElementById('viewOtherDetails').innerText = member.doj || member.otherDetails || "-";
+            document.getElementById('viewCustId').innerText = member.tokenNo || "-";
+            document.getElementById('viewKittyNo').innerText = member.acCode;
+            document.getElementById('viewMonthlyAmount').innerText = "₹" + Number(member.monthlyAmount).toLocaleString('en-IN');
+            document.getElementById('viewOtherDetails').innerText = member.doj || "-";
             document.getElementById('viewDueRuleBadge').innerText = "Due: " + (member.dueDateRule || "10th");
 
-            fetch(`${config.scriptUrl}?action=getData&phone=${encodeURIComponent(member.phone)}&kittyNumber=${encodeURIComponent(member.acCode || member.kittyNumber)}&_ts=${Date.now()}`, {
-                method: "GET",
-                mode: "cors"
-            })
+            if (sessionUser && sessionUser.role === "Admin") {
+                document.getElementById('btnSuperAdminEditCust').classList.remove('hidden-view');
+            }
+
+            fetch(`${config.scriptUrl}?action=getData&phone=${encodeURIComponent(member.phone)}&kittyNumber=${encodeURIComponent(member.acCode)}&_ts=${Date.now()}`)
             .then(r => r.json())
             .then(res => {
                 hideLoader();
-                if (!res || !res.profile) return uiAlert("Query Error", "Unable to load member statement details.");
+                if (!res || !res.profile) return alert("Could not load profile.");
 
-                const userTxs = res.transactions || [];
-                let paidMonths = 0, totalDeposited = 0;
-
-                userTxs.forEach(t => {
+                const txs = res.transactions || [];
+                let paidCount = 0, totalDep = 0;
+                txs.forEach(t => {
                     if (t.status && t.status.toLowerCase() === "paid") {
-                        paidMonths++;
-                        totalDeposited += parseFloat(t.amount) || 0;
+                        paidCount++;
+                        totalDep += parseFloat(t.amount) || 0;
                     }
                 });
 
-                document.getElementById('viewTotalBalance').innerText = "INR " + totalDeposited.toLocaleString('en-IN');
-                document.getElementById('viewPaidRatio').innerText = `${paidMonths} / ${config.schemeMonths} Completed`;
+                document.getElementById('viewTotalBalance').innerText = "₹" + totalDep.toLocaleString('en-IN');
+                document.getElementById('viewPaidRatio').innerText = `${paidCount} / ${config.schemeMonths} Complete`;
 
-                const mAmount = Number(member.monthlyAmount) || 0;
-                let twelveMonthsPrincipal = 12 * mAmount;
-                let assuredBonus = mAmount;
-                let maturityVal = twelveMonthsPrincipal + assuredBonus;
-
-                document.getElementById('viewJewellerBonus').innerText = "+INR " + assuredBonus.toLocaleString('en-IN');
-                document.getElementById('viewMaturityTotal').innerText = "INR " + maturityVal.toLocaleString('en-IN');
+                const mAmount = Number(member.monthlyAmount) || 5000;
+                document.getElementById('viewBonusVal').innerText = "+₹" + mAmount.toLocaleString('en-IN');
+                document.getElementById('viewMaturityTotal').innerText = "₹" + ((12 * mAmount) + mAmount).toLocaleString('en-IN');
 
                 const tbody = document.getElementById('memberTxTableBody');
                 tbody.innerHTML = "";
 
                 for (let m = 1; m <= config.schemeMonths; m++) {
-                    let record = userTxs.find(t => Number(t.month) === m);
-                    if (record && record.status.toLowerCase() === "paid") {
+                    const rowData = txs.find(t => Number(t.month) === m);
+                    if (rowData) {
+                        const isSuperAdmin = (sessionUser && sessionUser.role === "Admin");
+                        const editBtn = isSuperAdmin ? `<button onclick='openEditTxModal(${JSON.stringify(rowData)})' class="bg-slate-200 text-slate-800 font-bold px-2 py-1 rounded text-[10px] cursor-pointer active-press">Edit</button>` : "-";
+
                         tbody.innerHTML += `
-                            <tr class="bg-slate-50/50">
-                                <td class="p-2.5 sm:p-3 font-semibold text-slate-800">Month ${m}</td>
-                                <td class="p-2.5 sm:p-3"><span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">SETTLED</span></td>
-                                <td class="p-2.5 sm:p-3 font-mono font-bold text-slate-900">INR ${Number(record.amount).toLocaleString('en-IN')}</td>
-                                <td class="p-2.5 sm:p-3 font-mono text-slate-600">${record.rate ? 'INR ' + Number(record.rate).toLocaleString('en-IN') : '-'}</td>
-                                <td class="p-2.5 sm:p-3 font-mono font-bold text-amber-900">${(Number(record.bookedGrams)||0).toFixed(3)} g</td>
-                                <td class="p-2.5 sm:p-3 font-mono text-slate-500">${record.utr || 'Counter Deposit'}</td>
-                            </tr>
-                        `;
-                    } else if (record && (record.status.toLowerCase() === "pending" || record.status.toLowerCase() === "reviewed")) {
-                        tbody.innerHTML += `
-                            <tr class="bg-amber-50/30">
-                                <td class="p-2.5 sm:p-3 font-semibold text-slate-800">Month ${m}</td>
-                                <td class="p-2.5 sm:p-3"><span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[10px]">${record.status.toUpperCase()}</span></td>
-                                <td class="p-2.5 sm:p-3 font-mono font-bold text-slate-900">INR ${Number(record.amount).toLocaleString('en-IN')}</td>
-                                <td class="p-2.5 sm:p-3 font-mono text-slate-500">${record.rate || '-'}</td>
-                                <td class="p-2.5 sm:p-3 font-mono text-slate-500">${record.bookedGrams ? record.bookedGrams + ' g' : '-'}</td>
-                                <td class="p-2.5 sm:p-3 font-mono text-slate-500">${record.utr}</td>
+                            <tr>
+                                <td class="p-3 font-bold">Month ${m}</td>
+                                <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${rowData.status === 'Paid' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${rowData.status}</span></td>
+                                <td class="p-3 font-mono font-bold">₹${Number(rowData.amount).toLocaleString('en-IN')}</td>
+                                <td class="p-3 font-mono">${rowData.rate ? '₹' + rowData.rate : '-'}</td>
+                                <td class="p-3 font-mono font-bold">${(Number(rowData.bookedGrams)||0).toFixed(3)}g</td>
+                                <td class="p-3 font-mono text-slate-500">${rowData.utr || 'Showroom'}</td>
+                                <td class="p-3 text-center">${editBtn}</td>
                             </tr>
                         `;
                     } else {
                         tbody.innerHTML += `
                             <tr class="text-slate-400">
-                                <td class="p-2.5 sm:p-3 font-medium">Month ${m}</td>
-                                <td class="p-2.5 sm:p-3"><span class="bg-slate-100 text-slate-400 font-medium px-2 py-0.5 rounded text-[10px]">UNPAID</span></td>
-                                <td class="p-2.5 sm:p-3 font-mono">-</td><td class="p-2.5 sm:p-3 font-mono">-</td><td class="p-2.5 sm:p-3 font-mono">-</td><td class="p-2.5 sm:p-3 font-mono">-</td>
+                                <td class="p-3">Month ${m}</td>
+                                <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-slate-100">Unpaid</span></td>
+                                <td class="p-3 font-mono">-</td><td class="p-3 font-mono">-</td><td class="p-3 font-mono">-</td><td class="p-3 font-mono">-</td><td class="p-3 text-center">-</td>
                             </tr>
                         `;
                     }
@@ -904,69 +456,139 @@
             .catch(() => hideLoader());
         }
 
-        function loadKmpPendingApprovals() {
-            const tableBody = document.getElementById('kmpApprovalTableBody');
-            showLoader("Accessing Verification Queue...");
+        // Super Admin Profile & MPIN Edit
+        function openSuperAdminCustomerModal() {
+            if (!selectedMemberData) return;
+            document.getElementById('editCustName').value = selectedMemberData.name;
+            document.getElementById('editCustPhone').value = selectedMemberData.phone;
+            document.getElementById('editCustAmount').value = selectedMemberData.monthlyAmount;
+            document.getElementById('editCustAc').value = selectedMemberData.acCode;
+            document.getElementById('editCustToken').value = selectedMemberData.tokenNo || "-";
+            document.getElementById('editCustDoj').value = selectedMemberData.doj || "";
+            document.getElementById('editCustEmail').value = selectedMemberData.email || "";
+            document.getElementById('editCustMpin').value = selectedMemberData.mpin || "";
+            document.getElementById('editCustomerModal').classList.remove('hidden-view');
+        }
 
-            fetch(`${config.scriptUrl}?action=getData&id=all_pending&_ts=${Date.now()}`, {
-                method: "GET",
-                mode: "cors"
+        function closeEditCustomerModal() {
+            document.getElementById('editCustomerModal').classList.add('hidden-view');
+        }
+
+        function submitSuperAdminCustomerEdit(e) {
+            e.preventDefault();
+            showLoader("Overwriting Profile & MPIN...");
+
+            const payload = {
+                action: "superAdminEditCustomer",
+                adminUser: sessionUser.username,
+                adminPin: sessionUser.pin,
+                oldPhone: selectedMemberData.phone,
+                oldAcCode: selectedMemberData.acCode,
+                newPhone: document.getElementById('editCustPhone').value.trim(),
+                newName: document.getElementById('editCustName').value.trim(),
+                newAmount: document.getElementById('editCustAmount').value.trim(),
+                newAcCode: document.getElementById('editCustAc').value.trim(),
+                newTokenNo: document.getElementById('editCustToken').value.trim(),
+                newDoj: document.getElementById('editCustDoj').value.trim(),
+                newEmail: document.getElementById('editCustEmail').value.trim(),
+                newMpin: document.getElementById('editCustMpin').value.trim()
+            };
+
+            fetch(config.scriptUrl, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payload)
             })
             .then(r => r.json())
-            .then(pendingList => {
+            .then(res => {
                 hideLoader();
-                if (!pendingList || pendingList.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500 font-medium">Verification queue cleared: No pending remittances found.</td></tr>`;
+                if (res.success) {
+                    alert("Customer profile & MPIN modified by Super Admin.");
+                    closeEditCustomerModal();
+                    selectedMemberData.phone = payload.newPhone;
+                    selectedMemberData.acCode = payload.newAcCode;
+                    selectedMemberData.name = payload.newName;
+                    selectedMemberData.monthlyAmount = payload.newAmount;
+                    selectedMemberData.mpin = payload.newMpin;
+                    loadMemberLedger(selectedMemberData);
+                } else alert(res.error || "Update failed.");
+            })
+            .catch(() => hideLoader());
+        }
+
+        // Super Admin Tx Edit
+        function openEditTxModal(tx) {
+            document.getElementById('editTxRow').value = tx.row;
+            document.getElementById('editTxAmount').value = tx.amount;
+            document.getElementById('editTxStatus').value = tx.status;
+            document.getElementById('editTxRate').value = tx.rate || "";
+            document.getElementById('editTxGrams').value = tx.bookedGrams || "";
+            document.getElementById('editTxUtr').value = tx.utr || "";
+            document.getElementById('editTxModal').classList.remove('hidden-view');
+        }
+
+        function closeEditTxModal() {
+            document.getElementById('editTxModal').classList.add('hidden-view');
+        }
+
+        function submitSuperAdminTxEdit(e) {
+            e.preventDefault();
+            showLoader("Updating Transaction Row...");
+
+            const payload = {
+                action: "superAdminEditTransaction",
+                adminUser: sessionUser.username,
+                adminPin: sessionUser.pin,
+                row: document.getElementById('editTxRow').value,
+                amount: document.getElementById('editTxAmount').value,
+                status: document.getElementById('editTxStatus').value,
+                rateApplied: document.getElementById('editTxRate').value,
+                bookedGrams: document.getElementById('editTxGrams').value,
+                utr: document.getElementById('editTxUtr').value.trim()
+            };
+
+            fetch(config.scriptUrl, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payload)
+            })
+            .then(r => r.json())
+            .then(res => {
+                hideLoader();
+                if (res.success) {
+                    alert("Transaction record modified.");
+                    closeEditTxModal();
+                    loadMemberLedger(selectedMemberData);
+                } else alert(res.error || "Update rejected.");
+            })
+            .catch(() => hideLoader());
+        }
+
+        function loadKmpPendingApprovals() {
+            showLoader("Loading Queue...");
+            fetch(`${config.scriptUrl}?action=getData&id=all_pending&_ts=${Date.now()}`)
+            .then(r => r.json())
+            .then(list => {
+                hideLoader();
+                const tbody = document.getElementById('kmpApprovalTableBody');
+                if (!list || list.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-bold">Queue cleared.</td></tr>`;
                     return;
                 }
-
-                tableBody.innerHTML = "";
-                pendingList.forEach(item => {
-                    const slipSrc = item.screenshotUrl || "";
-                    const linkMarkup = slipSrc 
-                        ? `<a href="${slipSrc}" target="_blank" class="text-slate-900 underline font-semibold block mt-0.5">Examine Receipt &rarr;</a>` 
-                        : `<span class="text-slate-400 italic">No document attached</span>`;
-
-                    let actionHtml = "";
-                    const isReviewed = (item.status || "").toLowerCase() === "reviewed";
-
-                    if (!isReviewed) {
-                        actionHtml += `
-                            <button onclick="executeRateReview('${item.row}', ${item.amount})" class="bg-amber-800 hover:bg-amber-700 text-white text-[11px] sm:text-xs px-2.5 py-1 rounded font-semibold cursor-pointer">
-                                Set 22K Rate &amp; Review
-                            </button>
-                        `;
-                    }
-
-                    if (sessionUser.role === "Admin" || sessionUser.canFinalApprove) {
-                        actionHtml += `
-                            <button onclick="executeFinalApproval('${item.row}', ${item.amount}, ${isReviewed})" class="ml-1 bg-slate-900 hover:bg-slate-800 text-white text-[11px] sm:text-xs px-2.5 py-1 rounded font-semibold cursor-pointer">
-                                ${isReviewed ? 'Commit to Ledger' : 'Authorize &amp; Post'}
-                            </button>
-                        `;
-                    }
-
-                    tableBody.innerHTML += `
-                        <tr id="row-kmp-${item.row}">
-                            <td class="p-3">
-                                <div class="font-bold text-slate-900 uppercase">${item.name}</div>
-                                <div class="text-[11px] text-slate-500 font-mono">+91 ${item.phone}</div>
+                tbody.innerHTML = "";
+                list.forEach(i => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td class="p-3 font-bold">${i.name}<br><span class="text-[10px] font-mono text-slate-400">+91 ${i.phone}</span></td>
+                            <td class="p-3 font-mono font-bold">${i.acCode}</td>
+                            <td class="p-3 font-bold">M-${i.month}</td>
+                            <td class="p-3 font-mono font-bold">₹${Number(i.amount).toLocaleString('en-IN')}</td>
+                            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${i.status === 'Reviewed' ? 'bg-slate-200' : 'bg-amber-100 text-amber-800'}">${i.status}</span></td>
+                            <td class="p-3 font-mono">${i.utr}</td>
+                            <td class="p-3 text-center">
+                                <button onclick="reviewTxPrompt(${i.row}, ${i.amount})" class="bg-amber-700 text-white font-bold px-2.5 py-1 rounded text-[10px] cursor-pointer active-press">Review</button>
+                                <button onclick="approveTxDirect(${i.row})" class="bg-slate-900 text-white font-bold px-2.5 py-1 rounded text-[10px] cursor-pointer active-press ml-1">Approve</button>
                             </td>
-                            <td class="p-3 font-mono">
-                                <strong>${item.acCode}</strong><br>
-                                <span class="text-slate-400">${item.customerId}</span>
-                            </td>
-                            <td class="p-3 font-bold text-slate-700">Month ${item.month}</td>
-                            <td class="p-3 font-bold text-slate-900 font-mono">INR ${Number(item.amount).toLocaleString('en-IN')}</td>
-                            <td class="p-3">
-                                <span class="px-2 py-0.5 rounded font-bold ${isReviewed ? 'bg-slate-200 text-slate-800' : 'bg-amber-100 text-amber-800'}">${item.status}</span>
-                                ${item.bookedGrams ? `<div class="font-mono text-slate-600 mt-1">${item.bookedGrams}g @ INR ${item.rateApplied}</div>` : ''}
-                            </td>
-                            <td class="p-3 font-mono">
-                                <div>UTR: ${item.utr}</div>
-                                ${linkMarkup}
-                            </td>
-                            <td class="p-3 text-center whitespace-nowrap">${actionHtml}</td>
                         </tr>
                     `;
                 });
@@ -974,77 +596,18 @@
             .catch(() => hideLoader());
         }
 
-        async function executeRateReview(rowId, amount) {
-            const promptFields = [
-                { id: 'rateVal', label: 'Today’s 22K Gold Rate for 10 Grams (INR) *', type: 'number', required: true, placeholder: 'e.g. 68500', mono: true }
-            ];
-
-            if (!sessionUser.bypass2SV && sessionUser.role !== "Admin") {
-                promptFields.push({ id: 'secondPin', label: 'Secondary Operator PIN (2-Step Verification) *', type: 'password', required: true, placeholder: 'Enter PIN', mono: true });
-            }
-
-            const inputData = await uiPrompt("Tier-1 Rate Review", `Remittance: INR ${Number(amount).toLocaleString('en-IN')}`, promptFields);
-            if (!inputData) return;
-
-            const rate10g = parseFloat(inputData.rateVal);
-            if (isNaN(rate10g) || rate10g <= 0) return uiAlert("Validation Failure", "A valid numerical 22K gold rate per 10 grams is required.");
-
-            showLoader("Recording Rate Verification in Database...");
+        function reviewTxPrompt(row, amount) {
+            const rate = prompt(`Enter Today's 22K Gold Rate for 10 Grams for Installment ₹${amount}:`, "68500");
+            if (!rate) return;
+            showLoader("Posting Rate...");
 
             fetch(config.scriptUrl, {
                 method: "POST",
-                mode: "cors",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({
                     action: "reviewTransaction",
-                    row: rowId,
-                    rateUsed: rate10g,
-                    authUser: sessionUser.username,
-                    authPin: sessionUser.pin,
-                    secondPin: inputData.secondPin || ""
-                })
-            })
-            .then(r => r.json())
-            .then(res => {
-                hideLoader();
-                if (res.success) {
-                    uiAlert("Verification Logged", `Valuation posted to database. Allocated weight: ${res.gramsBooked} grams. Awaiting final ledger sign-off.`);
-                    loadKmpPendingApprovals();
-                } else {
-                    uiAlert("Authorization Error", res.error || "Review rejected by server.");
-                }
-            })
-            .catch(() => {
-                hideLoader();
-                uiAlert("Network Error", "Database communication error during review.");
-            });
-        }
-
-        async function executeFinalApproval(rowId, amount, isReviewed) {
-            let rate10g = 0;
-
-            if (!isReviewed) {
-                const inputData = await uiPrompt("Direct Ledger Authorization", `Remittance: INR ${Number(amount).toLocaleString('en-IN')}`, [
-                    { id: 'rateVal', label: 'Today’s 22K Gold Rate for 10 Grams (INR) *', type: 'number', required: true, placeholder: 'e.g. 68500', mono: true }
-                ]);
-                if (!inputData) return;
-                rate10g = parseFloat(inputData.rateVal);
-                if (isNaN(rate10g) || rate10g <= 0) return uiAlert("Validation Failure", "A valid 22K gold rate input is strictly mandatory.");
-            }
-
-            const confirmed = await uiConfirm("Confirm Transaction Authorization", "Proceed with permanent ledger booking and customer passbook credit?");
-            if (!confirmed) return;
-
-            showLoader("Posting Authorization to Database...");
-
-            fetch(config.scriptUrl, {
-                method: "POST",
-                mode: "cors",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({
-                    action: isReviewed ? "finalApprove" : "approve",
-                    row: rowId,
-                    rateUsed: rate10g,
+                    row: row,
+                    rateUsed: parseFloat(rate),
                     authUser: sessionUser.username,
                     authPin: sessionUser.pin
                 })
@@ -1053,331 +616,37 @@
             .then(res => {
                 hideLoader();
                 if (res.success) {
-                    uiAlert("Settlement Committed", isReviewed ? "Transaction settled and posted to ledger." : `Transaction authorized. ${res.gramsBooked} grams credited to passbook.`);
+                    alert(`${res.gramsBooked} grams booked.`);
                     loadKmpPendingApprovals();
-                } else {
-                    uiAlert("Posting Error", res.error || "Server rejected ledger entry.");
-                }
-            })
-            .catch(() => {
-                hideLoader();
-                uiAlert("Network Error", "Communication error encountered during ledger update.");
-            });
-        }
-
-        function loadStaffUsersList() {
-            if (sessionUser.role !== "Admin") return;
-            showLoader("Retrieving Operator Records...");
-
-            fetch(`${config.scriptUrl}?action=getStaffUsers&adminUser=${encodeURIComponent(sessionUser.username)}&adminPin=${encodeURIComponent(sessionUser.pin)}&_ts=${Date.now()}`, {
-                method: "GET",
-                mode: "cors"
-            })
-            .then(r => r.json())
-            .then(res => {
-                hideLoader();
-                if (!res.success) return uiAlert("Access Denied", res.error || "Administrator credentials required.");
-                const tbody = document.getElementById('userTableBody');
-                tbody.innerHTML = "";
-
-                res.users.forEach(u => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td class="p-3 font-bold text-slate-900">${u.username}</td>
-                            <td class="p-3 font-semibold">${u.role}</td>
-                            <td class="p-3">${u.canApprove ? 'Authorized' : 'Restricted'}</td>
-                            <td class="p-3">${u.canFinalApprove ? 'Authorized' : 'Restricted'}</td>
-                            <td class="p-3">${u.bypass2SV ? 'Exempt' : 'Mandatory 2SV'}</td>
-                            <td class="p-3"><span class="px-2 py-0.5 rounded font-bold ${u.status === 'Active' ? 'bg-slate-100 text-slate-800' : 'bg-rose-100 text-rose-800'}">${u.status}</span></td>
-                            <td class="p-3 text-center">
-                                ${u.username.toLowerCase() !== 'admin' ? `
-                                    <button onclick='editUserRow(${JSON.stringify(u)})' class="text-slate-900 font-bold mr-2 cursor-pointer">Configure</button>
-                                    <button onclick="deleteStaffUser('${u.username}')" class="text-rose-700 font-bold cursor-pointer">Remove</button>
-                                ` : '<span class="text-slate-400 italic">Root Authority</span>'}
-                            </td>
-                        </tr>
-                    `;
-                });
+                } else alert(res.error);
             })
             .catch(() => hideLoader());
         }
 
-        function openUserEditModal() {
-            document.getElementById('userModalTitle').innerText = "Register New Operator";
-            document.getElementById('usrNameInput').value = "";
-            document.getElementById('usrNameInput').readOnly = false;
-            document.getElementById('usrPinInput').value = "";
-            document.getElementById('usrRoleInput').value = "Staff";
-            document.getElementById('usrCanApprove').checked = true;
-            document.getElementById('usrCanFinalApprove').checked = false;
-            document.getElementById('usrBypass2SV').checked = false;
-            document.getElementById('userModal').classList.remove('hidden-view');
-        }
-
-        function editUserRow(u) {
-            document.getElementById('userModalTitle').innerText = "Configure Operator: " + u.username;
-            document.getElementById('usrNameInput').value = u.username;
-            document.getElementById('usrNameInput').readOnly = true;
-            document.getElementById('usrPinInput').value = u.pin;
-            document.getElementById('usrRoleInput').value = u.role;
-            document.getElementById('usrCanApprove').checked = u.canApprove;
-            document.getElementById('usrCanFinalApprove').checked = u.canFinalApprove;
-            document.getElementById('usrBypass2SV').checked = u.bypass2SV;
-            document.getElementById('userModal').classList.remove('hidden-view');
-        }
-
-        function closeUserModal() {
-            document.getElementById('userModal').classList.add('hidden-view');
-        }
-
-        function saveStaffUser(e) {
-            e.preventDefault();
-            showLoader("Uploading Operator Permissions to Database...");
-
-            const payload = {
-                action: "saveStaffUser",
-                adminUser: sessionUser.username,
-                adminPin: sessionUser.pin,
-                username: document.getElementById('usrNameInput').value.trim(),
-                pin: document.getElementById('usrPinInput').value.trim(),
-                role: document.getElementById('usrRoleInput').value,
-                canApprove: document.getElementById('usrCanApprove').checked,
-                canFinalApprove: document.getElementById('usrCanFinalApprove').checked,
-                bypass2SV: document.getElementById('usrBypass2SV').checked,
-                status: "Active"
-            };
+        function approveTxDirect(row) {
+            if (!confirm("Commit this transaction to customer passbook?")) return;
+            showLoader("Authorizing...");
 
             fetch(config.scriptUrl, {
                 method: "POST",
-                mode: "cors",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({
+                    action: "approve",
+                    row: row,
+                    authUser: sessionUser.username,
+                    authPin: sessionUser.pin
+                })
             })
             .then(r => r.json())
             .then(res => {
                 hideLoader();
                 if (res.success) {
-                    uiAlert("Configuration Saved", "Operator permissions committed to database.");
-                    closeUserModal();
-                    loadStaffUsersList();
-                } else {
-                    uiAlert("Database Error", res.error || "Unable to save operator permissions.");
-                }
+                    alert("Transaction approved.");
+                    loadKmpPendingApprovals();
+                } else alert(res.error);
             })
-            .catch(() => {
-                hideLoader();
-                uiAlert("Network Failure", "Error communicating with server.");
-            });
+            .catch(() => hideLoader());
         }
-
-        async function deleteStaffUser(targetUser) {
-            const confirmed = await uiConfirm("Confirm Removal", `Permanently remove operator access for ${targetUser}?`);
-            if (!confirmed) return;
-
-            showLoader("Removing Operator Record from Database...");
-
-            fetch(`${config.scriptUrl}?action=deleteStaffUser&adminUser=${encodeURIComponent(sessionUser.username)}&adminPin=${encodeURIComponent(sessionUser.pin)}&targetUser=${encodeURIComponent(targetUser)}&_ts=${Date.now()}`, {
-                method: "GET",
-                mode: "cors"
-            })
-            .then(r => r.json())
-            .then(res => {
-                hideLoader();
-                if (res.success) {
-                    uiAlert("Success", "Operator profile deleted from database.");
-                    loadStaffUsersList();
-                } else {
-                    uiAlert("Database Error", res.error || "Unable to delete operator.");
-                }
-            })
-            .catch(() => {
-                hideLoader();
-                uiAlert("Network Error", "Communication timeout.");
-            });
-        }
-
-        function openAddMemberModal() { document.getElementById('addMemberModal').classList.remove('hidden-view'); }
-        function closeAddMemberModal() { document.getElementById('addMemberModal').classList.add('hidden-view'); }
-
-        function submitNewMember(e) {
-            e.preventDefault();
-            showLoader("Enrolling Member into System Database...");
-
-            const payload = {
-                action: "addMember",
-                phone: document.getElementById('newPhone').value.trim(),
-                name: document.getElementById('newName').value.trim(),
-                monthlyAmount: document.getElementById('newAmount').value,
-                customerId: document.getElementById('newCustId').value.trim() || "-",
-                kittyNumber: document.getElementById('newKittyNo').value.trim(),
-                otherDetails: document.getElementById('newRemarks').value,
-                email: document.getElementById('newEmail').value.trim()
-            };
-
-            fetch(config.scriptUrl, {
-                method: "POST",
-                mode: "cors",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify(payload)
-            })
-            .then(r => r.json())
-            .then(res => {
-                hideLoader();
-                if (res && res.success) {
-                    uiAlert("Enrollment Confirmed", "Member registered and initialized in database.");
-                    closeAddMemberModal();
-                } else {
-                    uiAlert("Enrollment Failure", res.error || "Unable to save member record.");
-                }
-            })
-            .catch(() => {
-                hideLoader();
-                uiAlert("Network Error", "Server connection timeout.");
-            });
-        }
-
-        function openManualDepositModal() {
-            if (!selectedMemberData) return;
-            document.getElementById('depositTargetLabel').innerText = `${selectedMemberData.name} - Account: ${selectedMemberData.acCode || selectedMemberData.kittyNumber}`;
-            document.getElementById('depositAmount').value = selectedMemberData.monthlyAmount;
-            document.getElementById('depositRate').value = "";
-            document.getElementById('lblLiveAllocatedWeight').innerText = "0.000 g";
-
-            const select = document.getElementById('depositMonth');
-            select.innerHTML = "";
-            for (let m = 1; m <= config.schemeMonths; m++) {
-                select.innerHTML += `<option value="${m}">Month ${m}</option>`;
-            }
-            document.getElementById('manualDepositModal').classList.remove('hidden-view');
-        }
-
-        function closeManualDepositModal() { document.getElementById('manualDepositModal').classList.add('hidden-view'); }
-
-        function calculateRealtimeGold() {
-            const amount = parseFloat(document.getElementById('depositAmount').value) || 0;
-            const rate10g = parseFloat(document.getElementById('depositRate').value) || 0;
-
-            if (amount > 0 && rate10g > 0) {
-                const perGram = rate10g / 10;
-                const grams = (amount / perGram).toFixed(3);
-                document.getElementById('lblLiveAllocatedWeight').innerText = `${grams} g`;
-            } else {
-                document.getElementById('lblLiveAllocatedWeight').innerText = "0.000 g";
-            }
-        }
-
-        function submitManualDeposit(e) {
-            e.preventDefault();
-            const amount = parseFloat(document.getElementById('depositAmount').value);
-            const rate10g = parseFloat(document.getElementById('depositRate').value);
-            const month = document.getElementById('depositMonth').value;
-            const ref = document.getElementById('depositRef').value.trim() || "Showroom Counter";
-
-            if (!amount || !rate10g) return uiAlert("Validation Error", "Remittance amount and 22K gold rate are strictly mandatory.");
-
-            showLoader("Recording Counter Payment to Database...");
-            const perGram = rate10g / 10;
-            const grams = (amount / perGram).toFixed(3);
-
-            const payload = {
-                action: "manualEntry",
-                phone: selectedMemberData.phone,
-                kittyNumber: selectedMemberData.acCode || selectedMemberData.kittyNumber,
-                month: month,
-                amount: amount,
-                rateUsed: rate10g,
-                gramsBooked: grams,
-                utr: ref
-            };
-
-            fetch(config.scriptUrl, {
-                method: "POST",
-                mode: "cors",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify(payload)
-            })
-            .then(r => r.json())
-            .then(res => {
-                hideLoader();
-                closeManualDepositModal();
-                uiAlert("Payment Committed", `Transaction registered in database. ${grams} grams booked.`);
-                loadMemberLedger(selectedMemberData);
-            })
-            .catch(() => {
-                hideLoader();
-                uiAlert("Network Error", "Timeout committing payment record.");
-            });
-        }
-
-        async function confirmRemoveMember() {
-            if (!selectedMemberData) return;
-            const confirmed = await uiConfirm("Confirm Account Deletion", `Are you sure you want to permanently remove member ${selectedMemberData.name} (Account: ${selectedMemberData.acCode || selectedMemberData.kittyNumber})?`);
-            if (!confirmed) return;
-
-            showLoader("Deleting Member from Database...");
-
-            const targetUrl = `${config.scriptUrl}?action=deleteMember`
-                + `&phone=${encodeURIComponent(selectedMemberData.phone)}`
-                + `&kittyNumber=${encodeURIComponent(selectedMemberData.acCode || selectedMemberData.kittyNumber)}`
-                + `&_ts=${Date.now()}`;
-
-            fetch(targetUrl, { method: "GET", mode: "cors" })
-            .then(r => r.json())
-            .then(res => {
-                hideLoader();
-                if (res && res.success) {
-                    uiAlert("Deletion Successful", "Member record successfully deleted.");
-                    document.getElementById('memberProfileSection').classList.add('hidden-view');
-                } else {
-                    uiAlert("Database Error", res.error || "Unable to delete member record.");
-                }
-            })
-            .catch(() => {
-                hideLoader();
-                uiAlert("Network Error", "Communication timeout during deletion.");
-            });
-        }
-
-        // Custom Cursor & Reveal Animations Observer
-        document.addEventListener('DOMContentLoaded', () => {
-            const dot = document.getElementById('cursorDot');
-            const ring = document.getElementById('cursorRing');
-
-            if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && dot && ring) {
-                let mouseX = 0, mouseY = 0;
-                let ringX = 0, ringY = 0;
-
-                window.addEventListener('mousemove', (e) => {
-                    mouseX = e.clientX;
-                    mouseY = e.clientY;
-                    dot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
-                });
-
-                function renderRing() {
-                    ringX += (mouseX - ringX) * 0.18;
-                    ringY += (mouseY - ringY) * 0.18;
-                    ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
-                    requestAnimationFrame(renderRing);
-                }
-                requestAnimationFrame(renderRing);
-
-                const interactiveElements = 'a, button, input, select, textarea, [onclick]';
-                document.querySelectorAll(interactiveElements).forEach((el) => {
-                    el.addEventListener('mouseenter', () => ring.classList.add('active-hover'));
-                    el.addEventListener('mouseleave', () => ring.classList.remove('active-hover'));
-                });
-            }
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                    }
-                });
-            }, { threshold: 0.1 });
-
-            document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-        });
     </script>
 </body>
 </html>
