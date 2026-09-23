@@ -214,7 +214,7 @@
                     </div>
                 </div>
 
-                <!-- 12+1 Assured Valuation Card -->
+                <!-- 12+1 Assured Valuation Card (Real-Time HTML Formula Computed) -->
                 <div class="reveal bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
                     <div class="flex justify-between items-center border-b border-slate-100 pb-2">
                         <span class="text-xs font-bold text-slate-900 uppercase tracking-wider">Maturity Projection (12 + 1)</span>
@@ -260,7 +260,7 @@
         </div>
     </div>
 
-    <!-- Payment Modal (WITH FULL DYNAMIC UPI QR & ACCURATE HDFC BANK DETAILS) -->
+    <!-- Payment Modal (WITH DYNAMIC UPI QR & ACCURATE HDFC BANK DETAILS) -->
     <div id="paymentModal" class="hidden-view fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-start justify-center p-3 pt-4 sm:pt-8 z-50 overflow-y-auto">
         <div class="bg-white rounded-2xl p-4 sm:p-6 w-full max-w-md shadow-xl border border-slate-100 max-h-[90vh] overflow-y-auto animate-bounce-short">
             <div class="border-b border-slate-100 pb-3 mb-3.5 flex justify-between items-start">
@@ -575,6 +575,7 @@
                     if (t.status === "Paid") paidCount++;
                 });
 
+                // HTML Real-Time Calculations
                 document.getElementById('custLiveBalance').innerText = "₹" + (paidCount * globalMonthlyAmount).toLocaleString('en-IN');
                 document.getElementById('lblJewellerBonus').innerText = "+₹" + globalMonthlyAmount.toLocaleString('en-IN');
                 document.getElementById('lblTotalJewelleryWorth').innerText = "₹" + ((12 * globalMonthlyAmount) + globalMonthlyAmount).toLocaleString('en-IN');
