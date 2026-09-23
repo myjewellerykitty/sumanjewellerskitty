@@ -89,7 +89,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col justify-between">
 
-    <!-- FLOATING ON-SCREEN NOTIFICATION CONTAINER (ZERO BROWSER POPUPS) -->
+    <!-- FLOATING ON-SCREEN NOTIFICATION CONTAINER -->
     <div id="toastContainer" class="fixed top-4 left-1/2 -translate-x-1/2 z-[99999] flex flex-col items-center gap-2 pointer-events-none w-full max-w-sm px-4"></div>
 
     <div id="cursorDot" class="cursor-dot"></div>
@@ -107,7 +107,7 @@
 
     <div id="customerView" class="max-w-md mx-auto w-full p-3 sm:p-4 flex-1">
         <div>
-            <!-- Header with Official White Suman Jewellers Logo in Badge -->
+            <!-- Header with Official White Suman Jewellers Logo in White Circle Badge -->
             <header class="reveal bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-4 sm:mb-5">
                 <img src="https://i.pinimg.com/736x/e0/2d/25/e02d25f6a4cfc5970b015b7a951fa722.jpg" alt="Banner" class="w-full h-28 sm:h-32 object-cover object-center">
                 <div class="p-3 sm:p-4 text-center relative pt-8">
@@ -214,7 +214,7 @@
                     </div>
                 </div>
 
-                <!-- 12+1 Assured Valuation Card (Client-Side Calculated) -->
+                <!-- 12+1 Assured Valuation Card -->
                 <div class="reveal bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
                     <div class="flex justify-between items-center border-b border-slate-100 pb-2">
                         <span class="text-xs font-bold text-slate-900 uppercase tracking-wider">Maturity Projection (12 + 1)</span>
@@ -260,7 +260,7 @@
         </div>
     </div>
 
-    <!-- Payment Modal -->
+    <!-- Payment Modal (WITH FULL DYNAMIC UPI QR & ACCURATE HDFC BANK DETAILS) -->
     <div id="paymentModal" class="hidden-view fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-start justify-center p-3 pt-4 sm:pt-8 z-50 overflow-y-auto">
         <div class="bg-white rounded-2xl p-4 sm:p-6 w-full max-w-md shadow-xl border border-slate-100 max-h-[90vh] overflow-y-auto animate-bounce-short">
             <div class="border-b border-slate-100 pb-3 mb-3.5 flex justify-between items-start">
@@ -271,10 +271,51 @@
                 <button onclick="closePaymentModal()" class="text-slate-400 hover:text-slate-700 font-bold text-lg cursor-pointer p-1 active-press">&times;</button>
             </div>
 
+            <!-- Direct UPI App Button -->
             <a id="btnUpiAppPay" href="#" class="w-full mb-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all active-press">
                 Pay Via UPI App (GPay / PhonePe / Paytm)
             </a>
 
+            <!-- Mode Toggle: QR vs Bank Credentials -->
+            <button onclick="togglePaymentMethodView()" id="btnPaymentToggle" class="w-full mb-3.5 bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold py-2 rounded-xl transition-all cursor-pointer text-center active-press">
+                Switch to Bank Account Credentials
+            </button>
+
+            <!-- 1. UPI QR Code View -->
+            <div id="channelUpiView" class="bg-slate-50 rounded-xl p-3.5 border border-slate-200 flex flex-col items-center justify-center mb-3.5">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Scan Official Showroom QR Code</p>
+                <div class="w-32 h-32 sm:w-36 sm:h-36 bg-white p-2 rounded-lg border border-slate-200 shadow-sm flex items-center justify-center">
+                    <img id="qrCodeImg" src="" alt="UPI Payment QR Code" class="w-full h-full object-contain">
+                </div>
+                <button onclick="copyUpiId()" class="mt-2.5 text-xs font-mono text-slate-700 hover:text-slate-900 font-semibold cursor-pointer active-press">
+                    Copy VPA: <span id="lblUpiVpa" class="font-bold text-slate-900">vyapar.178552646415@hdfcbank</span>
+                </button>
+            </div>
+
+            <!-- 2. Showroom Official HDFC Bank Transfer Credentials -->
+            <div id="channelBankView" class="hidden-view bg-slate-50 rounded-xl p-3.5 border border-slate-200 mb-3.5 space-y-2 text-xs text-slate-800">
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-1">Showroom Official Bank Account</p>
+                <div>
+                    <span class="text-slate-400 font-medium block text-[9px] uppercase">Bank Name</span>
+                    <span class="font-bold text-slate-900">HDFC BANK LTD.</span>
+                </div>
+                <div>
+                    <span class="text-slate-400 block text-[9px] uppercase">Account Title</span>
+                    <span class="font-bold text-slate-900">SUMAN JEWELLERS</span>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <div>
+                        <span class="text-slate-400 block text-[9px] uppercase">Account Number</span>
+                        <span class="font-bold font-mono text-slate-900">50200016538756</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block text-[9px] uppercase">IFSC Code</span>
+                        <span class="font-bold font-mono text-slate-900">HDFC0009113</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction Slip Submission -->
             <div class="space-y-3 mb-4">
                 <div>
                     <label class="text-[11px] font-bold text-slate-500 uppercase block mb-1">Transaction UTR / Reference</label>
@@ -571,6 +612,7 @@
             .catch(() => hideLoader());
         }
 
+        // OPENS PAYMENT MODAL WITH DYNAMIC QR AND HDFC DETAILS
         function openPaymentModal(m) {
             currentSelectedMonth = m;
             document.getElementById('utrInput').value = "";
@@ -579,11 +621,37 @@
 
             const note = encodeURIComponent(`GRAS M${m} - ${globalAcCode}`);
             document.getElementById('btnUpiAppPay').href = `upi://pay?pa=${config.upiVpa}&pn=${encodeURIComponent(config.name)}&am=${globalMonthlyAmount}&cu=INR&tn=${note}`;
+            
+            // Dynamic QR Generator with Month & Amount
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(`upi://pay?pa=${config.upiVpa}&pn=${encodeURIComponent(config.name)}&am=${globalMonthlyAmount}&cu=INR&tn=${note}`)}`;
+            document.getElementById('qrCodeImg').src = qrApiUrl;
+
             document.getElementById('paymentModal').classList.remove('hidden-view');
         }
 
         function closePaymentModal() {
             document.getElementById('paymentModal').classList.add('hidden-view');
+        }
+
+        function copyUpiId() {
+            navigator.clipboard.writeText(config.upiVpa);
+            alert("Merchant UPI VPA copied to clipboard: " + config.upiVpa);
+        }
+
+        // TOGGLES BETWEEN INSTANT UPI QR & HDFC BANK DETAILS
+        function togglePaymentMethodView() {
+            const upiBox = document.getElementById('channelUpiView');
+            const bankBox = document.getElementById('channelBankView');
+            const toggleBtn = document.getElementById('btnPaymentToggle');
+            if (upiBox.classList.contains('hidden-view')) {
+                upiBox.classList.remove('hidden-view');
+                bankBox.classList.add('hidden-view');
+                toggleBtn.innerText = "Switch to Bank Account Credentials";
+            } else {
+                upiBox.classList.add('hidden-view');
+                bankBox.classList.remove('hidden-view');
+                toggleBtn.innerText = "Switch to Instant UPI QR Display";
+            }
         }
 
         function submitPaymentData() {
